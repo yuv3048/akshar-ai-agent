@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Doto:wght@100..900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=VT323&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --font-doto: "Doto", sans-serif;
+  --font-space: "Space Grotesk", sans-serif;
+  --font-inter: "Inter", sans-serif;
+  --font-code: "JetBrains Mono", monospace;
+  --font-vt323: "VT323", monospace;
+}
+
+body {
+  font-family: var(--font-inter);
+  background-color: #000000;
+  color: #F5F5F5;
+}

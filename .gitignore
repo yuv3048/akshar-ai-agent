@@ -1,0 +1,35 @@
+
+# Environment files in all services
+**/.env
+**/.env.*
+!**/.env.example
+
+# Dependencies
+**/node_modules/
+
+# Build output
+**/dist/
+**/build/
+**/.next/
+**/coverage/
+
+# Logs
+**/*.log
+
+# Local OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Environment secrets
+**/.env
+**/.env.*
+!**/.env.example
+
+# Firebase / Google Cloud service-account credentials
+**/serviceAccountKey.json
+**/*service-account*.json
+**/*serviceAccount*.json
+
+# Dependencies
+**/node_modules/
