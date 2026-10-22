@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "akshar-ai-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-22",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "observability": {
+    "enabled": true
+  },
+  "r2_buckets": [
+    {
+      "binding": "AKSHAR_FILES",
+      "bucket_name": "akshar-files"
+    }
+  ],
+  "vars": {
+    "APP_ENV": "development",
+    "CORS_ORIGIN": "http://localhost:5173"
+  }
+}
