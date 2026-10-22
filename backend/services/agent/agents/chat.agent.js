@@ -9,7 +9,9 @@ import { getMemory } from "../config/memory.js";
 import redis from "../../../shared/redis/redis.js";
 
 export const chatAgent = async (state) => {
-  
+
+  try {
+
   const llm = await getModel("chat");
 
   const history = await getMemory(state.conversationId);
@@ -146,5 +148,13 @@ Prioritize accuracy, relevance, clarity, and usefulness.
     ...state,
     aiResponse,
   };
+    
+  } catch (error) {
+    return {
+    ...state,
+    aiResponse: "❌ Failed to generate Response..🥺"
+    };
+  }
+  
 };
 

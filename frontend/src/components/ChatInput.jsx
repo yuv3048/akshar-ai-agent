@@ -111,9 +111,9 @@ function ChatInput() {
       label:"Search"
     },
     {
-      id:"image",
+      id:"vision",
       icon:ImageIcon,
-      label:"Image"
+      label:"Vision"
     }
   ]
 
