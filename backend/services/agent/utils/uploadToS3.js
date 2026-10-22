@@ -6,7 +6,7 @@ export const uploadToS3 = async(filename, buffer, contentType) =>{
         new PutObjectCommand({
             Bucket:process.env.AWS_S3_BUCKET,
             Body:buffer,
-            key:filename,
+            Key:filename,
             ContentType:contentType
         })
     )

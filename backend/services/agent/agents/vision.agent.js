@@ -36,17 +36,31 @@ ${state.prompt}
 
 const prompt = res.content.trim()
 
-const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}`
+const imageRes = await axios.post(
+  `${process.env.VISION_WORKER_URL}/generate`,
+  { prompt },
+  {
+    responseType: "arraybuffer",
+    timeout: 180000,
+    headers: {
+      Authorization: `Bearer ${process.env.VISION_API_SECRET}`,
+    },
+  }
+);
 
-const imageRes = await axios.get(imageUrl,{responseType:"arraybuffer"})
+const buffer = Buffer.from(imageRes.data);
 
-const buffer = Buffer.from(imageRes.data)
+const filename = `image-${Date.now()}.jpg`
 
-const filename = `image-${Date.now()}.png`
+console.log("Uploading:", filename);
 
-await uploadToS3(filename, buffer, "image/png")
+await uploadToS3(filename, buffer, "image/jpeg");
 
-const downloadUrl = await getFromS3(filename, 10*60)
+console.log("Upload successful");
+
+const downloadUrl = await getFromS3(filename, 10 * 60);
+
+console.log("Download URL generated");
 
 return {
     ...state,
@@ -56,18 +70,27 @@ return {
 
 ![Generated Image](${downloadUrl})
 
-🔗 [Download Image](${downloadUrl})
+🔗 [Download Image](${process.env.BACKEND_URL}/api/images/${filename}/download)
 
 ⏱️ Link expires in 10 minutes.
 
 `
 }
-    } catch (error) {
-        return {
-    ...state,
-    aiResponse:"❌ Failed to generate image..🥺"
-        }
-    }
-  
+} catch (error) {
+    console.error("Vision Agent Error:", {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data
+            ? Buffer.isBuffer(error.response.data)
+                ? error.response.data.toString("utf8").slice(0, 1000)
+                : error.response.data
+            : undefined,
+        url: error.config?.url
+    });
 
+    return {
+        ...state,
+        aiResponse: "❌ Image generation failed. Check backend logs."
+    };
+}
 }

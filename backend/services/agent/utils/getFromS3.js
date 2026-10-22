@@ -6,8 +6,8 @@ export const getFromS3 = async(filename, expiresIn=600)=>{
     return await getSignedUrl(
         s3,
         new GetObjectCommand({
-            Bucket:process.env.AWS_BUCKET_NAME,
-            key:filename
+            Bucket:process.env.AWS_S3_BUCKET,
+            Key:filename
         }
         ),
         {expiresIn}
