@@ -1,10 +1,13 @@
-import express from "express"
-import { agent } from "../controllers/agent.controller.js"
-import { downloadImage } from "../controllers/image.controller.js";
+import express from "express";
+import { agent } from "../controllers/agent.controller.js";
+import { downloadAsset } from "../controllers/download.controller.js";
+import { previewAsset } from "../controllers/preview.controller.js";
 
-const router = express.Router()
+const router = express.Router();
 
-router.post("/chat",agent)
-router.get("/images/:filename", downloadImage)
+router.post("/chat", agent);
 
-export default router
+router.get("/images/:filename", downloadAsset);
+router.get("/preview/:filename", previewAsset);
+
+export default router;

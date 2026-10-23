@@ -1,6 +1,8 @@
 import { getModel } from '../config/llmModel.js'
 import axios from 'axios';
 import { uploadToS3 } from '../utils/uploadToS3.js';
+import { getFromS3 } from '../utils/getFromS3.js';
+import redis from '../../../shared/redis/redis.js';
 
 export const visionAgent = async(state)=>{
 
@@ -196,6 +198,23 @@ if (!baseUrl) {
   throw new Error("BACKEND_URL is not configured");
 }
 
+const previewS3Url = await getFromS3(filename, 600, "inline");
+const downloadS3Url = await getFromS3(filename, 600, "attachment");
+
+// Store both URLs in Redis for 9 minutes
+await redis.set(
+  `asset:${filename}`,
+  JSON.stringify({
+    previewUrl: previewS3Url,
+    downloadUrl: downloadS3Url,
+  }),
+  "EX",
+  540
+);
+
+const previewUrl =
+  `${baseUrl}/api/agent/preview/${encodeURIComponent(filename)}`;
+
 const downloadUrl =
   `${baseUrl}/api/agent/images/${encodeURIComponent(filename)}`;
 
@@ -204,11 +223,15 @@ return {
   aiResponse: `
 # 🖼️ Image Generated Successfully
 
-![Generated Image](${downloadUrl})
+![Generated Image](${previewUrl})
 
 [Download Image](${downloadUrl})
+
+_Expires in 9 minutes._
 `,
 };
+
+
 
 } catch (error) {
     console.error("Vision Agent Error:", {

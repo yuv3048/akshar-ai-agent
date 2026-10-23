@@ -3,6 +3,7 @@ import { getModel } from "../config/llmModel.js";
 import { generatePdf } from "../utils/generatePdf.js";
 import { uploadToS3 } from "../utils/uploadToS3.js";
 import { getFromS3 } from "../utils/getFromS3.js";
+import redis from "../../../shared/redis/redis.js";
 
 export const pdfAgent = async (state) => {
   try {
@@ -70,26 +71,59 @@ ${state.prompt}
     }
 
     const pdfBuffer = await generatePdf(data);
-
     const filename = `pdf-${Date.now()}.pdf`;
 
     await uploadToS3(filename, pdfBuffer, "application/pdf");
 
-    // 600 seconds = 10 minutes
-    const downloadUrl = await getFromS3(filename, 600);
+    const baseUrl = process.env.BACKEND_URL?.replace(/\/+$/, "");
 
-    console.log("PDF generated:", filename);
-    console.log("Download URL:", downloadUrl);
+    if (!baseUrl) {
+      throw new Error("BACKEND_URL is not configured");
+    }
+
+    // S3 URLs: inline for preview, attachment for download
+    const previewS3Url = await getFromS3(
+      filename,
+      600,
+      "inline"
+    );
+
+    const downloadS3Url = await getFromS3(
+      filename,
+      600,
+      "attachment"
+    );
+
+    // Store both URLs in Redis for 9 minutes
+    await redis.set(
+      `asset:${filename}`,
+      JSON.stringify({
+        previewUrl: previewS3Url,
+        downloadUrl: downloadS3Url,
+      }),
+      "EX",
+      540
+    );
+
+    const previewUrl =
+      `${baseUrl}/api/agent/preview/${encodeURIComponent(filename)}`;
+
+    const downloadUrl =
+      `${baseUrl}/api/agent/images/${encodeURIComponent(filename)}`;
+
+    console.log("PDF generated and uploaded:", filename);
 
     return {
       ...state,
-      aiResponse: `# PDF Generated
+      aiResponse: `
+# 📄 PDF Generated Successfully
 
-    **${data.title}**
-        
-    [Download PDF](${downloadUrl})
-        
-    _Link expires in 10 minutes._`,
+**${data.title}**
+
+[Preview PDF](${previewUrl}) [Download PDF](${downloadUrl})
+
+_Expires in 9 minutes._
+`,
     };
   } catch (error) {
     console.error("PDF agent error:", error);
@@ -100,3 +134,4 @@ ${state.prompt}
     };
   }
 };
+

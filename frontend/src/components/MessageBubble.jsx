@@ -1,5 +1,5 @@
 import Markdown from 'react-markdown'
-import { Check, Copy, Download, ExternalLink, X } from "lucide-react";
+import { Check, Copy, Download, ExternalLink, EyeDashed, X } from "lucide-react";
 import { useState } from 'react';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter} from 'react-syntax-highlighter';
@@ -116,23 +116,29 @@ function MessageBubble({role, content, images}) {
               </td>
             ),
             a: ({ href, children }) => {
-              const isDownload = String(children).toLowerCase().includes("download");
-            
-              if (isDownload) {
+              const label = String(children).toLowerCase();
+                        
+              const isDownload = label.includes("download");
+              const isPreview = label.includes("preview");
+                        
+              if (isDownload || isPreview) {
                 return (
                   <a
                     href={href}
-                    className="my-3 inline-flex items-center gap-2 rounded-4xl
+                    target={isPreview ? "_blank" : undefined}
+                    rel={isPreview ? "noopener noreferrer" : undefined}
+                    className="mr-2 inline-flex items-center gap-2 rounded-4xl
                       bg-black font-space border border-orange-600
-                      px-4 py-2.5 font-medium text-slate-300 no-underline transition
-                      hover:brightness-110 hover:text-slate-100"
+                      px-4 py-2.5 font-medium text-slate-300 no-underline
+                      transition hover:brightness-110 hover:text-slate-100"
                   >
-                    <Download size={17} />
+                    {isDownload ? <Download size={17} /> : <Eye size={17} />}
                     {children}
                   </a>
                 );
               }
             
+              // Preserve the original styling for source links and all other links.
               return (
                 <a
                   href={href}
