@@ -1,5 +1,5 @@
 import Markdown from 'react-markdown'
-import { Check, Copy, Download, ExternalLink, EyeDashed, X } from "lucide-react";
+import { Check, Copy, Download, ExternalLink, Eye, X } from "lucide-react";
 import { useState } from 'react';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter} from 'react-syntax-highlighter';
@@ -116,42 +116,48 @@ function MessageBubble({role, content, images}) {
               </td>
             ),
             a: ({ href, children }) => {
-              const label = String(children).toLowerCase();
-                        
-              const isDownload = label.includes("download");
-              const isPreview = label.includes("preview");
-                        
-              if (isDownload || isPreview) {
-                return (
-                  <a
-                    href={href}
-                    target={isPreview ? "_blank" : undefined}
-                    rel={isPreview ? "noopener noreferrer" : undefined}
-                    className="mr-2 inline-flex items-center gap-2 rounded-4xl
-                      bg-black font-space border border-orange-600
-                      px-4 py-2.5 font-medium text-slate-300 no-underline
-                      transition hover:brightness-110 hover:text-slate-100"
-                  >
-                    {isDownload ? <Download size={17} /> : <Eye size={17} />}
-                    {children}
-                  </a>
-                );
-              }
-            
-              // Preserve the original styling for source links and all other links.
-              return (
-                <a
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-orange-600 font-medium underline
-                    inline-flex items-center gap-1"
-                >
-                  {children}
-                  <ExternalLink size={14} />
-                </a>
-              );
-            },
+  const label =
+    typeof children === "string"
+      ? children.toLowerCase()
+      : Array.isArray(children)
+        ? children.map((child) =>
+            typeof child === "string" ? child : ""
+          ).join("").toLowerCase()
+        : "";
+
+  const isDownload = label.includes("download");
+  const isPreview = label.includes("preview");
+
+  if (isDownload || isPreview) {
+    return (
+      <a
+        href={href || "#"}
+        target={isPreview ? "_blank" : undefined}
+        rel={isPreview ? "noopener noreferrer" : undefined}
+        className="mr-2 inline-flex items-center gap-2 rounded-4xl
+          bg-black font-space border border-orange-600
+          px-4 py-2.5 font-medium text-slate-300 no-underline
+          transition hover:brightness-110 hover:text-slate-100"
+      >
+        {isDownload ? <Download size={17} /> : <Eye size={17} />}
+        {children}
+      </a>
+    );
+  }
+
+  return (
+    <a
+      href={href || "#"}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-orange-600 font-medium underline
+        inline-flex items-center gap-1"
+    >
+      {children}
+      <ExternalLink size={14} />
+    </a>
+  );
+},
             hr: () => (
               <hr className="my-6 h-px border-0
                 bg-gradient-to-r
