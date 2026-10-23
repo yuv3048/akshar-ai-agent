@@ -14,6 +14,11 @@ const gemini = new ChatGoogleGenerativeAI({
   maxRetries: 2,
 });
 
+// Retry Groq failures with Gemini without changing the agents that use getModel().
+const groqWithGeminiFallback = groq.withFallbacks({
+  fallbacks: [gemini],
+});
+
 const deepseek = new ChatOpenRouter({
   model: "deepseek/deepseek-chat",
   temperature: 0.1,
@@ -24,15 +29,15 @@ const deepseek = new ChatOpenRouter({
 export const getModel = async (agent) => {
   switch (agent) {
     case "chat":
-      return groq;
+      return groqWithGeminiFallback;
 
     case "search":
-      return groq;
+      return groqWithGeminiFallback;
 
     case "coding":
       return deepseek;
 
     default:
-      return groq;
+      return groqWithGeminiFallback;
   }
 };
