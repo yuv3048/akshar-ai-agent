@@ -36,16 +36,16 @@ export const agent = async (req, res) => {
       return res.status(400).json({ message: "Conversation ID is required" });
     }
 
-    // Load existing history before persisting the current prompt, so the current
-    // prompt can be appended to Redis exactly once and remain available to the graph.
-    await getMemory(conversationId, userId);
-
     const rateKey = `chat-rate:${userId}`;
     const rateCount = await redis.incr(rateKey);
     if (rateCount === 1) await redis.expire(rateKey, CHAT_RATE_WINDOW_SECONDS);
     if (rateCount > CHAT_RATE_LIMIT) {
       return res.status(429).json({ message: "Too many requests. Please wait a minute and try again." });
     }
+
+    // Load existing history before persisting the current prompt, so the current
+    // prompt can be appended to Redis exactly once and remain available to the graph.
+    await getMemory(conversationId, userId);
 
     // This also verifies that the conversation belongs to this authenticated user.
     await axios.post(
