@@ -17,7 +17,7 @@ const gemini = new ChatGoogleGenerativeAI({
 const deepseek = new ChatOpenRouter({
   model: "deepseek/deepseek-chat",
   temperature: 0.1,
-  maxTokens: 2048,
+  maxTokens: 8192,
   maxRetries: 2,
 });
 
