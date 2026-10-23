@@ -166,7 +166,7 @@ function SideBar() {
             className="flex items-center justify-center w-7 rounded-lg text-slate-500 hover:text-slate-200
               hover:bg-white/[0.05] transition-colors duration-150 bg-transparent border-none cursor-pointer
               "
-            onClick={()=>dispatch(setSelectedConversation(null))}
+            onClick={() => { dispatch(setMessages([])); dispatch(setArtifacts([])); dispatch(setSelectedConversation(null)); }}
           >
             <SquarePen size={15} />
           </button>
@@ -210,7 +210,7 @@ function SideBar() {
                         ? "bg-orange-500/10 border-red-500/[0.18] rounded-r-lg border-l-2 border-l-orange-600"
                         : "bg-transparent border-transparent"
                     }`}
-                onClick={() => dispatch(setSelectedConversation(conv))}
+                onClick={() => { dispatch(setMessages([])); dispatch(setArtifacts([])); dispatch(setSelectedConversation(conv)); }}
               >
                 <div
                   className={`flex items-center justify-center shrink-0 w-[28px] h-[28px]
