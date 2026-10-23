@@ -5,7 +5,6 @@ function Nav({ onOpenSidebar }) {
   const { selectedConversation } = useSelector(state => state.conversation)
   const { messages } = useSelector(state => state.message)
 
-  if (!selectedConversation) return null
 
   return (
     <div className="h-14 flex items-center px-3 sm:px-5 border-b gap-2.5 border-white/[0.06] bg-[#000000] shrink-0">
@@ -24,7 +23,7 @@ function Nav({ onOpenSidebar }) {
       </div>
 
       <span className="font-space font-semibold text-sm tracking-wide text-slate-100 min-w-0 flex-1 truncate">
-        {selectedConversation.title || "New Chat"}
+        {selectedConversation?.title || "Akshar AI"}
       </span>
 
       <div className="text-[11px] font-inter font-medium text-slate-500 bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 rounded-full tracking-tight whitespace-nowrap shrink-0">
