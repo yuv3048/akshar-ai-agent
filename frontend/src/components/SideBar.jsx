@@ -178,7 +178,7 @@ function SideBar() {
                 bg-linear-to-br from-red-600 to-orange-700 rounded-4xl hover:from-orange-700 hover:to-red-600  
                                 border border-red-950 py-[10px] cursor-pointer hover:shadow-[0_1px_8px_rgba(234,70,35,0.35)] 
                 transition-opacity duration-150"
-            onClick={()=>dispatch(setSelectedConversation(null))}
+            onClick={() => { dispatch(setMessages([])); dispatch(setArtifacts([])); dispatch(setSelectedConversation(null)); }}
           >
             <MessageSquarePlus size={20} />
             New Chat
