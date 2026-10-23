@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import getMessages from "../features/getMessages";
 import { setArtifacts, setMessages } from "../redux/messageSlice";
 
-function ChatArea() {
+function ChatArea({ onOpenSidebar }) {
   const { selectedConversation } = useSelector((state) => state.conversation);
   const dispatch = useDispatch();
   const [suggestedAction, setSuggestedAction] = useState(null);
@@ -59,7 +59,7 @@ function ChatArea() {
 
   return (
     <div className="flex-1 flex flex-col min-w-0">
-      <Nav />
+      <Nav onOpenSidebar={onOpenSidebar} />
       <MessageList onSuggestionSelect={setSuggestedAction} isGenerating={isGenerating} />
       <ChatInput
         suggestedAction={suggestedAction}
