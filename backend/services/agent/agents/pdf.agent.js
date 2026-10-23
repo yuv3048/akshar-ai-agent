@@ -1,4 +1,4 @@
-
+import { randomUUID } from "node:crypto";
 import { getModel } from "../config/llmModel.js";
 import { generatePdf } from "../utils/generatePdf.js";
 import { uploadToS3 } from "../utils/uploadToS3.js";
@@ -8,15 +8,11 @@ import redis from "../../../shared/redis/redis.js";
 export const pdfAgent = async (state) => {
   try {
     const llm = await getModel("pdf");
-
     const prompt = `
 You are Akshar AI's professional document writer.
 
 Create high-quality, well-organized content for the user's topic.
-
-Return ONLY valid JSON. Do not include Markdown fences,
-explanations, or any text outside the JSON object.
-
+Return ONLY valid JSON. Do not include Markdown fences or explanations.
 Use exactly this structure:
 {
   "title": "Document title",
@@ -24,11 +20,7 @@ Use exactly this structure:
   "sections": [
     {
       "heading": "Section heading",
-      "points": [
-        "First concise point",
-        "Second concise point",
-        "Third concise point"
-      ]
+      "points": ["First concise point", "Second concise point", "Third concise point"]
     }
   ]
 }
@@ -37,7 +29,6 @@ Requirements:
 - Generate 4-8 meaningful sections.
 - Each section must contain 3-6 informative bullet points.
 - Ensure factual accuracy, clarity, and logical flow.
-- Avoid repetitive or irrelevant content.
 - Escape special characters correctly in JSON.
 - Do not invent citations or sources.
 
@@ -46,72 +37,39 @@ ${state.prompt}
 `;
 
     const res = await llm.invoke(prompt);
+    const content = typeof res.content === "string"
+      ? res.content
+      : Array.isArray(res.content)
+        ? res.content.map((part) => typeof part === "string" ? part : part.text ?? "").join("")
+        : "";
 
-    const content =
-      typeof res.content === "string"
-        ? res.content
-        : res.content
-            .map((part) =>
-              typeof part === "string" ? part : part.text ?? ""
-            )
-            .join("");
-
-    const json = content
-      .replace(/^```(?:json)?\s*/i, "")
-      .replace(/\s*```$/, "")
-      .trim();
-
+    const json = content.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
     const data = JSON.parse(json);
 
-    if (
-      typeof data.title !== "string" ||
-      !Array.isArray(data.sections)
-    ) {
+    if (typeof data.title !== "string" || !Array.isArray(data.sections)) {
       throw new Error("Invalid document structure returned by the model");
     }
+    if (!state.userId) throw new Error("Authenticated user ID is missing");
 
     const pdfBuffer = await generatePdf(data);
-    const filename = `pdf-${Date.now()}.pdf`;
-
+    const filename = `pdf-${randomUUID()}.pdf`;
     await uploadToS3(filename, pdfBuffer, "application/pdf");
 
     const baseUrl = process.env.BACKEND_URL?.replace(/\/+$/, "");
+    if (!baseUrl) throw new Error("BACKEND_URL is not configured");
 
-    if (!baseUrl) {
-      throw new Error("BACKEND_URL is not configured");
-    }
+    const previewS3Url = await getFromS3(filename, 600, "inline");
+    const downloadS3Url = await getFromS3(filename, 600, "attachment");
 
-    // S3 URLs: inline for preview, attachment for download
-    const previewS3Url = await getFromS3(
-      filename,
-      600,
-      "inline"
-    );
-
-    const downloadS3Url = await getFromS3(
-      filename,
-      600,
-      "attachment"
-    );
-
-    // Store both URLs in Redis for 9 minutes
     await redis.set(
       `asset:${filename}`,
-      JSON.stringify({
-        previewUrl: previewS3Url,
-        downloadUrl: downloadS3Url,
-      }),
+      JSON.stringify({ userId: String(state.userId), previewUrl: previewS3Url, downloadUrl: downloadS3Url }),
       "EX",
       540
     );
 
-    const previewUrl =
-      `${baseUrl}/api/agent/preview/${encodeURIComponent(filename)}`;
-
-    const downloadUrl =
-      `${baseUrl}/api/agent/images/${encodeURIComponent(filename)}`;
-
-    console.log("PDF generated and uploaded:", filename);
+    const previewUrl = `${baseUrl}/api/agent/preview/${encodeURIComponent(filename)}`;
+    const downloadUrl = `${baseUrl}/api/agent/images/${encodeURIComponent(filename)}`;
 
     return {
       ...state,
@@ -127,11 +85,6 @@ _Expires in 9 minutes._
     };
   } catch (error) {
     console.error("PDF agent error:", error);
-
-    return {
-      ...state,
-      aiResponse: "Failed to generate PDF. Please try again.",
-    };
+    return { ...state, aiResponse: "Failed to generate PDF. Please try again." };
   }
 };
-
