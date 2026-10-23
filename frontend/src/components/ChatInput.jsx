@@ -112,21 +112,6 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
       <div className="group flex flex-col gap-3 rounded-2xl border border-white/[0.10] bg-[#0D0F14] px-3 pt-3 pb-3 shadow-[0_12px_45px_rgba(0,0,0,0.28)] transition-colors focus-within:border-orange-500/35 sm:px-4">
 
 
-        <textarea
-          placeholder="Ask anything..."
-          onChange={(event) => setValue(event.target.value)}
-          value={value}
-          disabled={sending}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" && !event.shiftKey) {
-              event.preventDefault();
-              handleSendMessage();
-            }
-          }}
-          className="w-full bg-transparent outline-none resize-none text-[14px] text-slate-200 placeholder:text-slate-600 leading-relaxed [scrollbar-width:none] [&::-webkit-scrollbar]:hidden disabled:opacity-50"
-          rows={2}
-        />
-
         <div className="flex w-full gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {agents.map((agent) => {
             const isActive = selectedAgent === agent.label;
@@ -148,7 +133,24 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
               </button>
             );
           })}
-        </div>
+        </div
+
+        <textarea
+          placeholder="Ask anything..."
+          onChange={(event) => setValue(event.target.value)}
+          value={value}
+          disabled={sending}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              handleSendMessage();
+            }
+          }}
+          className="w-full bg-transparent outline-none resize-none text-[14px] text-slate-200 placeholder:text-slate-600 leading-relaxed [scrollbar-width:none] [&::-webkit-scrollbar]:hidden disabled:opacity-50"
+          rows={2}
+        />
+
+>
 
         {errorMessage && (
           <p role="alert" className="px-1 text-xs text-red-400">{errorMessage}</p>
