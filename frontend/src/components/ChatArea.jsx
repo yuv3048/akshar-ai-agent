@@ -61,9 +61,7 @@ function ChatArea() {
       <Nav />
       <MessageList onSuggestionSelect={setSuggestedAction} />
       <ChatInput
-        suggestedPrompt={suggestedAction?.prompt ?? ""}
-        suggestedAgent={suggestedAction?.agent ?? ""}
-        suggestedAutoSend={suggestedAction?.autoSend ?? false}
+        suggestedAction={suggestedAction}
         onSuggestionConsumed={clearSuggestedAction}
       />
     </div>
