@@ -34,7 +34,7 @@ function ChatInput() {
         dispatch(setArtifacts([]));
       }
 
-      dispatch(addMessage({ role: "user", content: prompt }));
+      dispatch(addMessage({ role: "user", content: prompt, conversationId: conversation._id }));
       setValue("");
 
       const data = await sendMessage({
@@ -55,6 +55,7 @@ function ChatInput() {
       dispatch(addMessage({
         role: "assistant",
         content: data.answer,
+        conversationId: conversation._id,
         images: data.images ?? [],
         artifacts: data.artifacts ?? [],
       }));
