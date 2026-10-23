@@ -276,7 +276,7 @@ ${userPrompt}
 </user_request>
 
 PROJECT FILES:
-${fileNames.map((name) => `- ${name}`).join("\\n")}
+${fileNames.map((name) => `- ${name}`).join("\n")}
 
 Requirements:
 - This is one part of a coherent, runnable project. Match the other files and use the listed paths.
