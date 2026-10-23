@@ -19,7 +19,7 @@ function Nav({ onOpenSidebar }) {
       </button>
 
       <img
-        src="/akshar-logo.svg"
+        src="/akshar-logo.png"
         alt="Akshar AI logo"
         className="h-8 w-8 shrink-0 object-contain"
       />
