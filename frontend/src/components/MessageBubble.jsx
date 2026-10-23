@@ -116,29 +116,45 @@ function MessageBubble({role, content, images, assetPreviewUrl, assetDownloadUrl
               </td>
             ),
             a: ({ href, children }) => {
-              const isAssetPreview =
-                href && href === assetPreviewUrl;
+              // Only Akshar AI's generated-asset routes get the download-button UI.
+              // Keep ordinary external links and research sources unchanged.
+              const isAksharAiPreview =
+                href && (href === assetPreviewUrl || href.includes("/api/agent/preview/"));
 
-              const isAssetDownload =
-                href && href === assetDownloadUrl;
+              const isAksharAiDownload =
+                href && (href === assetDownloadUrl || href.includes("/api/agent/images/"));
 
-              // Generated asset buttons
-              if (isAssetPreview || isAssetDownload) {
+              if (isAksharAiDownload) {
+                return (
+                  <a
+                    href={href}
+                    download
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="my-2 mr-2 inline-flex items-center gap-2 rounded-xl
+                      bg-linear-to-r from-orange-600 to-red-700
+                      px-4 py-2.5 font-space font-semibold text-white no-underline
+                      shadow-[0_2px_12px_rgba(234,70,35,0.2)]
+                      transition hover:brightness-110"
+                  >
+                    <Download size={17} />
+                    Download {href.toLowerCase().endsWith(".pdf") ? "PDF" : "Image"}
+                  </a>
+                );
+              }
+
+              if (isAksharAiPreview) {
                 return (
                   <a
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mr-2 inline-flex items-center gap-2 rounded-4xl
-                      bg-black font-space border border-orange-600
-                      px-4 py-2.5 font-medium text-slate-300 no-underline
+                    className="mr-2 inline-flex items-center gap-2 rounded-xl
+                      border border-orange-600 px-4 py-2.5 font-space
+                      font-medium text-slate-300 no-underline
                       transition hover:brightness-110 hover:text-slate-100"
                   >
-                    {isAssetPreview ? (
-                      <Eye size={17} />
-                    ) : (
-                      <Download size={17} />
-                    )}
+                    <Eye size={17} />
                     {children}
                   </a>
                 );
