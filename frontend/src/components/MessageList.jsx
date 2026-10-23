@@ -1,37 +1,53 @@
-import { useSelector } from "react-redux"
-import MessageBubble from "./MessageBubble"
+import { Code2, FileText, Globe2, Sparkles } from "lucide-react";
+import { useSelector } from "react-redux";
+import MessageBubble from "./MessageBubble";
 
-function MessageList() {
+const suggestions = [
+  { icon: Code2, label: "Build something", prompt: "Help me build a polished responsive website with HTML, CSS, and JavaScript.", detail: "Turn an idea into a working project" },
+  { icon: Globe2, label: "Explore a topic", prompt: "Explain how Redis works, with a practical example and when I should use it.", detail: "Learn with clear examples" },
+  { icon: FileText, label: "Create a document", prompt: "Create a well-structured beginner-friendly guide to system design.", detail: "Generate a useful guide or PDF" },
+];
 
-  const { selectedConversation } = useSelector(state=>state.conversation)
-  const {messages} = useSelector(state=>state.message)
+function MessageList({ onSuggestionSelect }) {
+  const { selectedConversation } = useSelector((state) => state.conversation);
+  const { messages } = useSelector((state) => state.message);
+  const isEmpty = !selectedConversation || messages.length === 0;
 
   return (
-    <div className='flex-1 overflow-y-auto px-6 space-y-5
-      [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
-        {!selectedConversation || messages.length === 0?(
-          <div className="h-full flex flex-col items-center justify-center gap-4
-             text-center">
-            <div className="flex flex-col gap-1.5">
-              <h1 className='text-2xl font-space font-semibold text-slate-200 tracking-wider'>Akshar AI</h1>
-              <p className='text-xl font-space font-normal text-slate-300 tracking-tight'>How can I help you?</p>
-              <p className='text-base font-inter max-w-[260px] font-light text-slate-400 leading-relaxed'>Ask me anything - code, ideas, explanations, or just a quick question.</p>
-            </div>
-            <div className='flex flex-wrap justify-center gap-2 mt-1'>
-              {["Write a Netflix clone", "Explain Redis", "Build a dashboard"].map((s)=>(
-              <button className='text-[12px] font-inter text-slate-300 bg-white/[0.04] border border-white/[0.07] px-3
-               py-1.5 rounded-lg hover:bg-white/[0.08] hover:text-slate-100 transition-colors duration-150
-               cursor-pointer'>
-                {s}
-              </button>
-              ))}
-            </div>
+    <div className="min-h-0 flex-1 overflow-y-auto px-3 py-5 sm:px-6 sm:py-8 [scrollbar-width:thin] [scrollbar-color:#27272a_transparent]">
+      {isEmpty ? (
+        <div className="mx-auto flex min-h-full w-full max-w-4xl flex-col items-center justify-center py-8 text-center">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/[0.06] px-3 py-1.5 text-[11px] font-medium tracking-wide text-orange-300">
+            <Sparkles size={13} />
+            YOUR AI WORKSPACE
           </div>
-        )
-          :
-        (
-          
-        <div className="space-y-5">
+          <h1 className="font-space text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+            Think it. <span className="bg-linear-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">Build it.</span>
+          </h1>
+          <p className="mt-4 max-w-lg text-sm leading-6 text-slate-400 sm:text-base">
+            Welcome to Akshar AI. Research ideas, solve problems, write code, or create something new.
+          </p>
+
+          <div className="mt-9 grid w-full max-w-3xl grid-cols-1 gap-3 text-left sm:grid-cols-3">
+            {suggestions.map(({ icon: Icon, label, prompt, detail }) => (
+              <button
+                type="button"
+                key={label}
+                onClick={() => onSuggestionSelect?.(prompt)}
+                className="group rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-500/30 hover:bg-white/[0.045] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/60"
+              >
+                <span className="mb-5 flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-slate-300 transition-colors group-hover:border-orange-500/20 group-hover:bg-orange-500/10 group-hover:text-orange-300">
+                  <Icon size={17} />
+                </span>
+                <span className="block text-sm font-medium text-slate-100">{label}</span>
+                <span className="mt-1.5 block text-xs leading-5 text-slate-500">{detail}</span>
+              </button>
+            ))}
+          </div>
+          <p className="mt-7 text-[11px] text-slate-600">Choose a starting point or ask your own question below.</p>
+        </div>
+      ) : (
+        <div className="mx-auto w-full max-w-4xl space-y-6 pb-4">
           {messages.map((msg, i) => (
             <div key={msg._id ?? i}>
               <MessageBubble
@@ -44,10 +60,9 @@ function MessageList() {
             </div>
           ))}
         </div>
-
-        )}
+      )}
     </div>
-  )
+  );
 }
 
-export default MessageList
+export default MessageList;
