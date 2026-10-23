@@ -21,7 +21,7 @@ function Nav({ onOpenSidebar }) {
       <img
         src="/akshar-logo.png"
         alt="Akshar AI logo"
-        className="h-8 w-8 shrink-0 object-contain"
+        className="h-9 w-20 shrink-0 object-contain object-center"
       />
 
       <span className="font-space font-semibold text-sm tracking-wide text-slate-100 min-w-0 flex-1 truncate">
