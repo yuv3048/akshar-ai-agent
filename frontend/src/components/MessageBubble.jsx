@@ -36,7 +36,7 @@ function MessageBubble({role, content, images, assetPreviewUrl, assetDownloadUrl
         ${isUser?
           'my-2 font-inter bg-linear-to-r from-red-600 to-orange-700 text-white rounded-tr-sm'
           : 
-          'my-2 font-inter bg-[#000000] border border-white/[0.08] text-slate-200 rounded-tl-sm'
+          'my-2 font-inter bg-[#000000] text-slate-200 rounded-tl-sm'
         }
         `}>
 
