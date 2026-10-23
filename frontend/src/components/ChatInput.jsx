@@ -78,7 +78,7 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed }) {
 
     // Prevent React Strict Mode's development effect replay from sending twice.
     lastHandledAction.current = suggestedAction;
-    const { prompt, agent, autoSend } = suggestedAction;
+    const { prompt, agent } = suggestedAction;
     if (!prompt) return;
 
     setValue(prompt);
@@ -87,9 +87,6 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed }) {
     else if (agent) setSelectedAgent(agent);
 
     onSuggestionConsumed?.();
-    if (autoSend) {
-      void handleSendMessage(prompt, agent);
-    }
   }, [suggestedAction, onSuggestionConsumed]);
 
   const agents = [
