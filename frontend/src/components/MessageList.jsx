@@ -55,7 +55,7 @@ function MessageList({ onSuggestionSelect, isGenerating = false }) {
   const isEmpty = !selectedConversation || messages.length === 0;
   const [visibleSuggestions, setVisibleSuggestions] = useState(() => getRandomSuggestions());
   const [isHoveringSuggestions, setIsHoveringSuggestions] = useState(false);
-  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+  const [loadingMessage, setLoadingMessage] = useState(() => loadingMessages[Math.floor(Math.random() * loadingMessages.length)]);
   const messageAreaRef = useRef(null);
 
   useEffect(() => {
@@ -69,13 +69,16 @@ function MessageList({ onSuggestionSelect, isGenerating = false }) {
   }, [messages.length, isGenerating]);
 
   useEffect(() => {
-    if (!isGenerating) {
-      setLoadingMessageIndex(0);
-      return;
-    }
+    if (!isGenerating) return;
 
+    let previousIndex = loadingMessages.indexOf(loadingMessage);
     const intervalId = setInterval(() => {
-      setLoadingMessageIndex((current) => (current + 1) % loadingMessages.length);
+      const availableIndices = loadingMessages
+        .map((_, index) => index)
+        .filter((index) => index !== previousIndex);
+      const nextIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+      previousIndex = nextIndex;
+      setLoadingMessage(loadingMessages[nextIndex]);
     }, 3000);
 
     return () => clearInterval(intervalId);
@@ -151,8 +154,8 @@ function MessageList({ onSuggestionSelect, isGenerating = false }) {
                 <LoaderCircle size={17} className="animate-spin" />
                 <span className="absolute inset-0 rounded-xl bg-orange-500/10 blur-md" />
               </span>
-              <span key={loadingMessageIndex} className="animate-pulse transition-opacity duration-300">
-                {loadingMessages[loadingMessageIndex]}
+              <span key={loadingMessage} className="animate-pulse transition-opacity duration-300">
+                {loadingMessage}
               </span>
               <span className="ml-auto flex items-center gap-1" aria-hidden="true">
                 <span className="h-1 w-1 animate-bounce rounded-full bg-orange-400 [animation-delay:-0.2s]" />
