@@ -1,4 +1,5 @@
 import redis from "../../../shared/redis/redis.js";
+import { getFromS3 } from "../utils/getFromS3.js";
 
 export const downloadAsset = async (req, res) => {
   try {
@@ -19,12 +20,9 @@ export const downloadAsset = async (req, res) => {
     if (String(asset?.userId) !== String(userId)) {
       return res.status(404).json({ message: "File not found" });
     }
-    if (!asset?.downloadUrl) {
-      return res.status(404).json({ message: "Download not available" });
-    }
-
+    const downloadUrl = await getFromS3(filename, 600, "attachment");
     res.setHeader("Cache-Control", "private, no-store");
-    return res.redirect(302, asset.downloadUrl);
+    return res.redirect(302, downloadUrl);
   } catch (error) {
     console.error("Asset download error:", error);
     return res.status(500).json({ message: "Failed to download file" });
