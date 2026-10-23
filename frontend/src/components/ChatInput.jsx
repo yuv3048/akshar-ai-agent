@@ -102,7 +102,7 @@ function ChatInput({ suggestedPrompt = "", onSuggestionConsumed }) {
                 key={agent.id}
                 disabled={sending}
                 onClick={() => setSelectedAgent(agent.label)}
-                className={`flex-shrink-0 inline-flex items-center gap-1.5 shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl font-inter text-xs font-medium cursor-pointer border transition-all disabled:opacity-50 ${
+                className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl font-inter text-xs font-medium cursor-pointer border transition-all disabled:opacity-50 ${
                   isActive
                     ? "bg-linear-to-r from-orange-700 to-red-600 text-white border-transparent shadow-[0_1px_8px_rgba(234,70,35,0.35)] hover:shadow-[0_2px_14px_rgba(234,70,35,0.5)]"
                     : "bg-white/[0.03] text-slate-400 border-white/[0.06] hover:bg-white/[0.07]"
@@ -127,7 +127,7 @@ function ChatInput({ suggestedPrompt = "", onSuggestionConsumed }) {
             }
           }}
           className="w-full bg-transparent outline-none resize-none text-[14px] text-slate-200 placeholder:text-slate-600 leading-relaxed [scrollbar-width:none] [&::-webkit-scrollbar]:hidden disabled:opacity-50"
-          rows={3}
+          rows={2}
         />
 
         {errorMessage && (
@@ -156,6 +156,8 @@ function ChatInput({ suggestedPrompt = "", onSuggestionConsumed }) {
             <Send size={20} />
           </button>
         </div>
+      </div>
+      <p className="mt-2 text-center text-[10px] font-inter text-slate-600">Akshar AI can make mistakes. Verify important information.</p>
       </div>
     </div>
   );
