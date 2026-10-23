@@ -255,7 +255,7 @@ function getFallbackFiles(userPrompt) {
 
 function stripCodeFence(content) {
   const trimmed = content.trim();
-  const match = trimmed.match(/^\`\`\`(?:[\\w.+-]+)?\\s*\\n([\\s\\S]*?)\\n\`\`\`$/);
+  const match = trimmed.match(/^\x60\x60\x60(?:[\w.+-]+)?\s*\n([\s\S]*?)\n\x60\x60\x60$/);
   return match ? match[1] : trimmed;
 }
 
