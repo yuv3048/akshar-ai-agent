@@ -1,11 +1,12 @@
-import { Code2, FileText, Globe2, Sparkles } from "lucide-react";
+import { Code2, FileText, Globe2, Presentation, Sparkles } from "lucide-react";
 import { useSelector } from "react-redux";
 import MessageBubble from "./MessageBubble";
 
 const suggestions = [
   { icon: Code2, label: "Build something", prompt: "Help me build a polished responsive website with HTML, CSS, and JavaScript.", detail: "Turn an idea into a working project" },
   { icon: Globe2, label: "Explore a topic", prompt: "Explain how Redis works, with a practical example and when I should use it.", detail: "Learn with clear examples" },
-  { icon: FileText, label: "Create a document", prompt: "Create a well-structured beginner-friendly guide to system design.", detail: "Generate a useful guide or PDF" },
+  { icon: FileText, label: "Create a document", prompt: "Create a downloadable PDF document: a well-structured beginner-friendly guide to system design, with clear sections, examples, and a concise summary.", detail: "Generate a PDF document", agent: "pdf", autoSend: true },
+  { icon: Presentation, label: "Create a presentation", prompt: "Create a PowerPoint presentation about system design for beginners, with a title slide, clear section slides, practical examples, and a conclusion.", detail: "Generate a PowerPoint presentation", agent: "ppt", autoSend: true },
 ];
 
 function MessageList({ onSuggestionSelect }) {
@@ -28,12 +29,12 @@ function MessageList({ onSuggestionSelect }) {
             Welcome to Akshar AI. Research ideas, solve problems, write code, or create something new.
           </p>
 
-          <div className="mt-9 grid w-full max-w-3xl grid-cols-1 gap-3 text-left sm:grid-cols-3">
-            {suggestions.map(({ icon: Icon, label, prompt, detail }) => (
+          <div className="mt-9 grid w-full max-w-4xl grid-cols-1 gap-3 text-left sm:grid-cols-2 lg:grid-cols-4">
+            {suggestions.map(({ icon: Icon, label, prompt, detail, agent, autoSend }) => (
               <button
                 type="button"
                 key={label}
-                onClick={() => onSuggestionSelect?.(prompt)}
+                onClick={() => onSuggestionSelect?.({ prompt, agent, autoSend: Boolean(autoSend) })}
                 className="group rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-500/30 hover:bg-white/[0.045] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/60"
               >
                 <span className="mb-5 flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-slate-300 transition-colors group-hover:border-orange-500/20 group-hover:bg-orange-500/10 group-hover:text-orange-300">
@@ -47,7 +48,7 @@ function MessageList({ onSuggestionSelect }) {
           <p className="mt-7 text-[11px] text-slate-600">Choose a starting point or ask your own question below.</p>
         </div>
       ) : (
-        <div className="mx-auto w-full max-w-4xl space-y-6 pb-4">
+        <div className="mx-auto w-full max-w-5xl space-y-6 pb-4">
           {messages.map((msg, i) => (
             <div key={msg._id ?? i}>
               <MessageBubble
