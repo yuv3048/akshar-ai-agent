@@ -81,10 +81,9 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
 
   
 
-
-  if (collapsed) {
-    return (
-      <aside className="hidden lg:flex h-screen w-14 shrink-0 flex-col items-center gap-2 border-r border-white/[0.06] bg-[#050505] py-4">
+  return (
+    <>
+      <aside className={`hidden h-screen w-14 shrink-0 flex-col items-center gap-2 border-r border-white/[0.06] bg-[#050505] py-4 lg:flex ${collapsed ? "" : "lg:hidden"}`}>
         <button
           type="button"
           aria-label="Expand sidebar"
@@ -105,11 +104,6 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
           <MessageSquarePlus size={19} />
         </button>
       </aside>
-    );
-  }
-
-  return (
-    <>
       {mobileOpen && (
         <button
           type="button"
@@ -118,9 +112,12 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
           onClick={onMobileClose}
         />
       )}
-      <aside className={`fixed inset-y-0 left-0 z-50 h-screen w-[270px] shrink-0 border-r border-white/[0.06] bg-[#050505] transition-transform duration-200 lg:static lg:translate-x-0 ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 h-screen w-[270px] shrink-0 border-r border-white/[0.06] bg-[#050505] transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} ${collapsed ? "lg:hidden" : "lg:static lg:translate-x-0"}`}>
       <div className="flex flex-col h-full">
         <div className="flex items-center gap-2.5 px-4 py-5 border-b border-white/[0.06]">
+          <span className="font-doto text-[20px] font-bold text-slate-300 flex-1">
+            Akshar AI
+          </span>
           <button
             type="button"
             aria-label="Collapse sidebar"
@@ -130,12 +127,10 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
           >
             <PanelLeft size={19} />
           </button>
-          <span className="font-doto text-[20px] font-bold text-slate-300 flex-1">
-            Akshar AI
-          </span>
           <button
             type="button"
             aria-label="Close sidebar"
+            title="Close sidebar"
             className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-slate-200 lg:hidden"
             onClick={onMobileClose}
           >
