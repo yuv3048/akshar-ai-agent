@@ -58,14 +58,11 @@ ${state.prompt}
     const baseUrl = process.env.BACKEND_URL?.replace(/\/+$/, "");
     if (!baseUrl) throw new Error("BACKEND_URL is not configured");
 
-    const previewS3Url = await getFromS3(filename, 600, "inline");
-    const downloadS3Url = await getFromS3(filename, 600, "attachment");
-
     await redis.set(
       `asset:${filename}`,
-      JSON.stringify({ userId: String(state.userId), previewUrl: previewS3Url, downloadUrl: downloadS3Url }),
+      JSON.stringify({ userId: String(state.userId) }),
       "EX",
-      540
+      604800
     );
 
     const previewUrl = `${baseUrl}/api/agent/preview/${encodeURIComponent(filename)}`;
@@ -80,7 +77,7 @@ ${state.prompt}
 
 [Preview PDF](${previewUrl}) [Download PDF](${downloadUrl})
 
-_Expires in 9 minutes._
+_Available for 7 days._
 `,
     };
   } catch (error) {
