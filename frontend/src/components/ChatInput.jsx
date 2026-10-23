@@ -41,6 +41,7 @@ function ChatInput() {
         prompt,
         conversationId: conversation._id,
         agent: selectedAgent.toLowerCase(),
+        generateTitle: conversation.title === "New Chat",
       });
 
       if (!data || typeof data.answer !== "string" || !data.answer.trim()) {
