@@ -10,6 +10,7 @@ function ChatArea() {
   const { selectedConversation } = useSelector((state) => state.conversation);
   const dispatch = useDispatch();
   const [suggestedAction, setSuggestedAction] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
   const clearSuggestedAction = useCallback(() => setSuggestedAction(null), []);
 
   useEffect(() => {
@@ -59,10 +60,11 @@ function ChatArea() {
   return (
     <div className="flex-1 flex flex-col min-w-0">
       <Nav />
-      <MessageList onSuggestionSelect={setSuggestedAction} />
+      <MessageList onSuggestionSelect={setSuggestedAction} isGenerating={isGenerating} />
       <ChatInput
         suggestedAction={suggestedAction}
         onSuggestionConsumed={clearSuggestedAction}
+        onSendingChange={setIsGenerating}
       />
     </div>
   );
