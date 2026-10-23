@@ -30,7 +30,7 @@ function MessageList({ onSuggestionSelect }) {
             Welcome to Akshar AI. Research ideas, solve problems, write code, or create something new.
           </p>
 
-          <div className="mt-9 flex w-full max-w-full gap-3 overflow-x-auto pb-3 text-left [scrollbar-width:thin] [scrollbar-color:#3f3f46_transparent]">
+          <div className="mt-9 flex w-full max-w-full flex-nowrap gap-3 overflow-x-auto pb-3 text-left [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {suggestions.map(({ icon: Icon, label, prompt, detail, agent }) => (
               <button
                 type="button"
