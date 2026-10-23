@@ -199,19 +199,11 @@ if (!baseUrl) {
   throw new Error("BACKEND_URL is not configured");
 }
 
-const previewS3Url = await getFromS3(filename, 600, "inline");
-const downloadS3Url = await getFromS3(filename, 600, "attachment");
-
-// Store both URLs in Redis for 9 minutes
 await redis.set(
   `asset:${filename}`,
-  JSON.stringify({
-    userId: String(state.userId),
-    previewUrl: previewS3Url,
-    downloadUrl: downloadS3Url,
-  }),
+  JSON.stringify({ userId: String(state.userId) }),
   "EX",
-  540
+  604800
 );
 
 const previewUrl =
@@ -229,7 +221,7 @@ return {
 
 [Download Image](${downloadUrl})
 
-_Expires in 9 minutes._
+_Available for 7 days._
 `,
 };
 
