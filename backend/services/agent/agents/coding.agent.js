@@ -25,6 +25,42 @@ function contentToString(content) {
   return "";
 }
 
+async function generateArtifactTitle(llm, userPrompt) {
+  const fallbackTitle = () => {
+    const words = userPrompt
+      .replace(/[^\\p{L}\\p{N}\\s-]/gu, " ")
+      .trim()
+      .split(/\\s+/)
+      .filter(Boolean)
+      .slice(0, 5);
+    if (words.length === 0) return "Generated Project";
+    if (words.length === 1) words.push("Project");
+    return words.join(" ");
+  };
+
+  try {
+    const response = await llm.invoke(`
+Create a concise title for a code artifact based on the user's request.
+Return only the title, with 2 to 5 words. No quotes, markdown, punctuation, or explanation.
+
+User request:
+${userPrompt}
+`);
+    const title = contentToString(response.content)
+      .replace(/["'`*_#]/g, "")
+      .replace(/[.!?:;]+$/g, "")
+      .replace(/\\s+/g, " ")
+      .trim();
+
+    const words = title.split(" ").filter(Boolean).slice(0, 5);
+    if (words.length >= 2) return words.join(" ");
+  } catch (error) {
+    console.error("Artifact title generation failed:", error.message);
+  }
+
+  return fallbackTitle();
+}
+
 function getFinishReason(response) {
   return (
     response?.response_metadata?.finish_reason ??
@@ -400,6 +436,7 @@ ${userPrompt}
 
   if (intent === "CODE_GENERATION") {
     const data = await generateProject(llm, userPrompt);
+    const artifactTitle = await generateArtifactTitle(intentLlm, userPrompt);
 
     return {
       ...state,
@@ -409,7 +446,7 @@ ${userPrompt}
         {
           id: Date.now(),
           type: "Project",
-          title: userPrompt.slice(0, 60),
+          title: artifactTitle,
           files: data.files,
         },
       ],
