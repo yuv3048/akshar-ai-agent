@@ -11,7 +11,17 @@ export const getMemory = async (conversationId, userId) => {
 
   if (cached) {
     try {
-      return JSON.parse(cached);
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed)) {
+        const normalized = parsed
+          .slice(-HISTORY_LIMIT)
+          .map(({ role, content }) => ({ role, content }));
+        if (normalized.length !== parsed.length) {
+          await redis.set(key, JSON.stringify(normalized), "EX", 86400);
+        }
+        return normalized;
+      }
+      await redis.del(key);
     } catch (error) {
       console.error("Invalid cached conversation history; rebuilding it:", error);
       await redis.del(key);
