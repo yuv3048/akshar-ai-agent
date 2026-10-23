@@ -8,18 +8,23 @@ import { setArtifacts, setMessages } from "../redux/messageSlice";
 
 function ChatArea() {
   const { selectedConversation } = useSelector((state) => state.conversation);
+  const { messages: currentMessages } = useSelector((state) => state.message);
   const dispatch = useDispatch();
 
   useEffect(() => {
     let cancelled = false;
 
     const loadMessages = async () => {
+      const isCurrentDraft =
+        selectedConversation?.title === "New Chat" &&
+        currentMessages.some((message) => message.conversationId === selectedConversation?._id);
+
+      if (isCurrentDraft) return;
+
       dispatch(setMessages([]));
       dispatch(setArtifacts([]));
 
-      if (!selectedConversation?._id || selectedConversation.title === "New Chat") {
-        return;
-      }
+      if (!selectedConversation?._id || selectedConversation.title === "New Chat") return;
 
       try {
         const data = await getMessages(selectedConversation._id);
