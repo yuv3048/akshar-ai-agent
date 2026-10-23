@@ -1,14 +1,23 @@
 import { useSelector } from "react-redux"
-import { BotMessageSquare } from "lucide-react"
+import { BotMessageSquare, PanelLeft } from "lucide-react"
 
-function Nav() {
+function Nav({ onOpenSidebar }) {
   const { selectedConversation } = useSelector(state => state.conversation)
   const { messages } = useSelector(state => state.message)
 
   if (!selectedConversation) return null
 
   return (
-    <div className="h-14 flex items-center px-5 border-b gap-2.5 border-white/[0.06] bg-[#000000] shrink-0">
+    <div className="h-14 flex items-center px-3 sm:px-5 border-b gap-2.5 border-white/[0.06] bg-[#000000] shrink-0">
+      <button
+        type="button"
+        aria-label="Open sidebar"
+        title="Open sidebar"
+        onClick={onOpenSidebar}
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.03] text-slate-400 transition-colors hover:border-orange-500/25 hover:bg-orange-500/10 hover:text-orange-300 lg:hidden"
+      >
+        <PanelLeft size={18} />
+      </button>
 
       <div className="flex items-center justify-center w-8 h-7 rounded-lg bg-orange-600/10 border border-red-700/20 shrink-0">
         <BotMessageSquare size={18} className="text-orange-600" />
