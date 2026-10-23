@@ -1,7 +1,15 @@
-import { Code2, FileText, Globe2, ImageIcon, Presentation, Sparkles } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Code2, FileText, Globe2, ImageIcon, LoaderCircle, Presentation, Sparkles } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import MessageBubble from "./MessageBubble";
+
+const loadingMessages = [
+  "Thinking through your request…",
+  "Connecting the pieces…",
+  "Putting the answer together…",
+  "Checking the details…",
+  "Making the response clearer…",
+];
 
 const suggestions = [
   { icon: Code2, label: "Build something", prompt: "Help me build a polished responsive website with HTML, CSS, and JavaScript.", detail: "Turn an idea into a working project", agent: "coding" },
@@ -28,12 +36,37 @@ function getRandomSuggestions(previous = []) {
   return [...currentSet].map((index) => suggestions[index]);
 }
 
-function MessageList({ onSuggestionSelect }) {
+function MessageList({ onSuggestionSelect, isGenerating = false }) {
   const { selectedConversation } = useSelector((state) => state.conversation);
   const { messages } = useSelector((state) => state.message);
   const isEmpty = !selectedConversation || messages.length === 0;
   const [visibleSuggestions, setVisibleSuggestions] = useState(() => getRandomSuggestions());
   const [isHoveringSuggestions, setIsHoveringSuggestions] = useState(false);
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+  const messageAreaRef = useRef(null);
+
+  useEffect(() => {
+    const messageArea = messageAreaRef.current;
+    if (!messageArea) return;
+
+    messageArea.scrollTo({
+      top: messageArea.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [messages.length, isGenerating]);
+
+  useEffect(() => {
+    if (!isGenerating) {
+      setLoadingMessageIndex(0);
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      setLoadingMessageIndex((current) => (current + 1) % loadingMessages.length);
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [isGenerating]);
 
   useEffect(() => {
     if (isHoveringSuggestions) return;
@@ -46,7 +79,7 @@ function MessageList({ onSuggestionSelect }) {
   }, [isHoveringSuggestions]);
 
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto px-3 py-5 sm:px-6 sm:py-8 [scrollbar-width:thin] [scrollbar-color:#27272a_transparent]">
+    <div ref={messageAreaRef} className="min-h-0 flex-1 overflow-y-auto px-3 py-5 sm:px-6 sm:py-8 [scrollbar-width:thin] [scrollbar-color:#27272a_transparent]">
       {isEmpty ? (
         <div className="mx-auto flex min-h-full w-full max-w-4xl flex-col items-center justify-center py-8 text-center">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/[0.06] px-3 py-1.5 font-doto text-[11px] font-bold tracking-widest text-orange-300">
@@ -95,6 +128,26 @@ function MessageList({ onSuggestionSelect }) {
               />
             </div>
           ))}
+          {isGenerating && (
+            <div
+              role="status"
+              aria-live="polite"
+              className="my-3 flex items-center gap-3 rounded-2xl border border-orange-500/15 bg-white/[0.025] px-4 py-3 text-sm text-slate-300"
+            >
+              <span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-orange-500/20 bg-orange-500/10 text-orange-300">
+                <LoaderCircle size={17} className="animate-spin" />
+                <span className="absolute inset-0 rounded-xl bg-orange-500/10 blur-md" />
+              </span>
+              <span key={loadingMessageIndex} className="animate-pulse transition-opacity duration-300">
+                {loadingMessages[loadingMessageIndex]}
+              </span>
+              <span className="ml-auto flex items-center gap-1" aria-hidden="true">
+                <span className="h-1 w-1 animate-bounce rounded-full bg-orange-400 [animation-delay:-0.2s]" />
+                <span className="h-1 w-1 animate-bounce rounded-full bg-orange-400 [animation-delay:-0.1s]" />
+                <span className="h-1 w-1 animate-bounce rounded-full bg-red-500" />
+              </span>
+            </div>
+          )}
         </div>
       )}
     </div>
