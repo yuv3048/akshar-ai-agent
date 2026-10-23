@@ -1,18 +1,24 @@
 import { Code2, FileText, Globe2, ImageIcon, MessageSquare, MicAudioLines, Paperclip, Presentation, Send, Zap } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import sendMessage from "../features/sendMessage.js";
 import { useDispatch, useSelector } from "react-redux";
 import { addMessage, setArtifacts, setMessages } from "../redux/messageSlice";
 import { createConversation } from "../features/createConversation.js";
 import { addConversation, setConvTitle, setSelectedConversation } from "../redux/conversationSlice.js";
 
-function ChatInput() {
+function ChatInput({ suggestedPrompt = "", onSuggestionConsumed }) {
   const [value, setValue] = useState("");
   const [selectedAgent, setSelectedAgent] = useState("Auto");
   const [sending, setSending] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { selectedConversation } = useSelector((state) => state.conversation);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!suggestedPrompt) return;
+    setValue(suggestedPrompt);
+    onSuggestionConsumed?.();
+  }, [suggestedPrompt, onSuggestionConsumed]);
 
   const handleSendMessage = async () => {
     const prompt = value.trim();
@@ -83,9 +89,10 @@ function ChatInput() {
   ];
 
   return (
-    <div className="w-full overflow-hidden px-3 md:px-5 py-4 border-t border-white/[0.06] bg-[#000000]">
-      <div className="flex flex-col gap-2 bg-white/[0.03] border border-white/[0.07] rounded-2xl px-4 pt-3.5 pb-3">
-        <div className="flex w-[80%] gap-2 pr-2 flex-wrap">
+    <div className="w-full shrink-0 bg-[#000000] px-3 pb-4 pt-2 sm:px-5">
+      <div className="mx-auto w-full max-w-4xl">
+      <div className="group flex flex-col gap-3 rounded-2xl border border-white/[0.10] bg-[#0D0F14] px-3 pt-3 pb-3 shadow-[0_12px_45px_rgba(0,0,0,0.28)] transition-colors focus-within:border-orange-500/35 sm:px-4">
+        <div className="flex w-full gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {agents.map((agent) => {
             const isActive = selectedAgent === agent.label;
             const Icon = agent.icon;
@@ -95,7 +102,7 @@ function ChatInput() {
                 key={agent.id}
                 disabled={sending}
                 onClick={() => setSelectedAgent(agent.label)}
-                className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-full font-inter text-xs font-medium cursor-pointer border transition-all disabled:opacity-50 ${
+                className={`flex-shrink-0 inline-flex items-center gap-1.5 shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl font-inter text-xs font-medium cursor-pointer border transition-all disabled:opacity-50 ${
                   isActive
                     ? "bg-linear-to-r from-orange-700 to-red-600 text-white border-transparent shadow-[0_1px_8px_rgba(234,70,35,0.35)] hover:shadow-[0_2px_14px_rgba(234,70,35,0.5)]"
                     : "bg-white/[0.03] text-slate-400 border-white/[0.06] hover:bg-white/[0.07]"
@@ -124,12 +131,12 @@ function ChatInput() {
         />
 
         {errorMessage && (
-          <p role="alert" className="text-xs text-red-400">{errorMessage}</p>
+          <p role="alert" className="px-1 text-xs text-red-400">{errorMessage}</p>
         )}
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
-            <button type="button" aria-label="Attach file" className="flex items-center justify-center w-8 h-8 rounded-lg text-slate-300 hover:text-slate-400 hover:bg-white/[0.05] border border-transparent hover:border-white/[0.06] transition-all duration-150 bg-transparent cursor-pointer">
+            <button type="button" aria-label="Attach file" className="flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-white/[0.06] border border-transparent transition-all duration-150 bg-transparent cursor-pointer">
               <Paperclip size={18} />
             </button>
             <button type="button" aria-label="Voice input" className="flex items-center justify-center w-8 h-8 rounded-lg text-slate-300 hover:text-slate-400 hover:bg-white/[0.05] border border-transparent hover:border-white/[0.06] transition-all duration-150 bg-transparent cursor-pointer">
@@ -140,9 +147,9 @@ function ChatInput() {
             type="button"
             disabled={!value.trim() || sending}
             onClick={handleSendMessage}
-            className={`flex items-center justify-center w-10 h-10 rounded-lg border-none transition-all duration-150 ${
+            className={`flex items-center justify-center w-10 h-10 rounded-xl border-none transition-all duration-150 ${
               value.trim() && !sending
-                ? "bg-linear-to-br from-orange-600 to-red-700 hover:opacity-90 text-white cursor-pointer"
+                ? "bg-linear-to-br from-orange-500 to-red-600 hover:brightness-110 text-white shadow-[0_4px_18px_rgba(234,70,35,0.18)] cursor-pointer"
                 : "bg-white/[0.05] text-slate-600 cursor-not-allowed"
             }`}
           >
