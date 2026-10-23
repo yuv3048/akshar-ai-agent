@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ChatInput from "./ChatInput";
 import MessageList from "./MessageList";
 import Nav from "./Nav";
@@ -9,6 +9,8 @@ import { setArtifacts, setMessages } from "../redux/messageSlice";
 function ChatArea() {
   const { selectedConversation } = useSelector((state) => state.conversation);
   const dispatch = useDispatch();
+  const [suggestedPrompt, setSuggestedPrompt] = useState("");
+  const clearSuggestedPrompt = useCallback(() => setSuggestedPrompt(""), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -57,8 +59,11 @@ function ChatArea() {
   return (
     <div className="flex-1 flex flex-col min-w-0">
       <Nav />
-      <MessageList />
-      <ChatInput />
+      <MessageList onSuggestionSelect={setSuggestedPrompt} />
+      <ChatInput
+        suggestedPrompt={suggestedPrompt}
+        onSuggestionConsumed={clearSuggestedPrompt}
+      />
     </div>
   );
 }
