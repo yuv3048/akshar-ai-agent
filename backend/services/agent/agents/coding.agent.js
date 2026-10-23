@@ -28,9 +28,9 @@ function contentToString(content) {
 async function generateArtifactTitle(llm, userPrompt) {
   const fallbackTitle = () => {
     const words = userPrompt
-      .replace(/[^\\p{L}\\p{N}\\s-]/gu, " ")
+      .replace(/[^\p{L}\p{N}\s-]/gu, " ")
       .trim()
-      .split(/\\s+/)
+      .split(/\s+/)
       .filter(Boolean)
       .slice(0, 5);
     if (words.length === 0) return "Generated Project";
@@ -49,7 +49,7 @@ ${userPrompt}
     const title = contentToString(response.content)
       .replace(/["'`*_#]/g, "")
       .replace(/[.!?:;]+$/g, "")
-      .replace(/\\s+/g, " ")
+      .replace(/\s+/g, " ")
       .trim();
 
     const words = title.split(" ").filter(Boolean).slice(0, 5);
