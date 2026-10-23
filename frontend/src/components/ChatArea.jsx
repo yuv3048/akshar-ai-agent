@@ -8,23 +8,24 @@ import { setArtifacts, setMessages } from "../redux/messageSlice";
 
 function ChatArea() {
   const { selectedConversation } = useSelector((state) => state.conversation);
-  const { messages: currentMessages } = useSelector((state) => state.message);
   const dispatch = useDispatch();
 
   useEffect(() => {
     let cancelled = false;
 
     const loadMessages = async () => {
-      const isCurrentDraft =
-        selectedConversation?.title === "New Chat" &&
-        currentMessages.some((message) => message.conversationId === selectedConversation?._id);
+      if (!selectedConversation?._id) {
+        dispatch(setMessages([]));
+        dispatch(setArtifacts([]));
+        return;
+      }
 
-      if (isCurrentDraft) return;
+      // Sidebar selection clears state before switching to a draft conversation.
+      // Preserve an optimistic first message while the new chat is running.
+      if (selectedConversation.title === "New Chat") return;
 
       dispatch(setMessages([]));
       dispatch(setArtifacts([]));
-
-      if (!selectedConversation?._id || selectedConversation.title === "New Chat") return;
 
       try {
         const data = await getMessages(selectedConversation._id);
