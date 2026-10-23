@@ -4,11 +4,24 @@ import { useSelector } from "react-redux";
 import MessageBubble from "./MessageBubble";
 
 const loadingMessages = [
-  "Thinking through your request…",
-  "Connecting the pieces…",
-  "Putting the answer together…",
-  "Checking the details…",
-  "Making the response clearer…",
+  "Hmm, let me think this through…",
+  "🐙 Fun fact: Octopuses have three hearts.",
+  "🦈 Weird fact: Sharks existed before trees.",
+
+  "Putting the pieces together for you…",
+  "🪐 Fun fact: A day on Venus is longer than its year.",
+  "🍌 Weird fact: Bananas are berries, but strawberries aren't.",
+
+  "Let me dig a little deeper…",
+  "🧠 Fun fact: Your brain has roughly 86 billion neurons.",
+  "👁️ Weird fact: Wombats produce cube-shaped poop.",
+
+  "I'm connecting the dots…",
+  "🌌 Fun fact: Light from the Sun takes about 8 minutes to reach Earth.",
+  "🐌 Weird fact: Some snails can sleep for years under harsh conditions.",
+
+  "Let me make sure this makes sense…",
+  "⚡ Fun fact: Lightning can heat the surrounding air hotter than the Sun's surface.",
 ];
 
 const suggestions = [
@@ -63,7 +76,7 @@ function MessageList({ onSuggestionSelect, isGenerating = false }) {
 
     const intervalId = setInterval(() => {
       setLoadingMessageIndex((current) => (current + 1) % loadingMessages.length);
-    }, 1000);
+    }, 3000);
 
     return () => clearInterval(intervalId);
   }, [isGenerating]);
