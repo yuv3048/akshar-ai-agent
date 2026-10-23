@@ -1,30 +1,19 @@
 import { Code2, FileText, Globe2, ImageIcon, MessageSquare, MicAudioLines, Paperclip, Presentation, Send, Zap } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import sendMessage from "../features/sendMessage.js";
 import { useDispatch, useSelector } from "react-redux";
 import { addMessage, setArtifacts, setMessages } from "../redux/messageSlice";
 import { createConversation } from "../features/createConversation.js";
 import { addConversation, setConvTitle, setSelectedConversation } from "../redux/conversationSlice.js";
 
-function ChatInput({ suggestedPrompt = "", suggestedAgent = "", suggestedAutoSend = false, onSuggestionConsumed }) {
+function ChatInput({ suggestedAction = null, onSuggestionConsumed }) {
   const [value, setValue] = useState("");
+  const lastHandledAction = useRef(null);
   const [selectedAgent, setSelectedAgent] = useState("Auto");
   const [sending, setSending] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { selectedConversation } = useSelector((state) => state.conversation);
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (!suggestedPrompt) return;
-    setValue(suggestedPrompt);
-    if (suggestedAgent === "pdf") setSelectedAgent("PDF");
-    else if (suggestedAgent === "ppt") setSelectedAgent("PPT");
-    else if (suggestedAgent) setSelectedAgent(suggestedAgent);
-    onSuggestionConsumed?.();
-    if (suggestedAutoSend) {
-      void handleSendMessage(suggestedPrompt, suggestedAgent);
-    }
-  }, [suggestedPrompt, suggestedAgent, suggestedAutoSend, onSuggestionConsumed]);
 
   const handleSendMessage = async (promptOverride, agentOverride) => {
     const prompt = (promptOverride ?? value).trim();
@@ -83,6 +72,25 @@ function ChatInput({ suggestedPrompt = "", suggestedAgent = "", suggestedAutoSen
       setSending(false);
     }
   };
+
+  useEffect(() => {
+    if (!suggestedAction || lastHandledAction.current === suggestedAction) return;
+
+    // Prevent React Strict Mode's development effect replay from sending twice.
+    lastHandledAction.current = suggestedAction;
+    const { prompt, agent, autoSend } = suggestedAction;
+    if (!prompt) return;
+
+    setValue(prompt);
+    if (agent === "pdf") setSelectedAgent("PDF");
+    else if (agent === "ppt") setSelectedAgent("PPT");
+    else if (agent) setSelectedAgent(agent);
+
+    onSuggestionConsumed?.();
+    if (autoSend) {
+      void handleSendMessage(prompt, agent);
+    }
+  }, [suggestedAction, onSuggestionConsumed]);
 
   const agents = [
     { id: "auto", icon: Zap, label: "Auto" },
