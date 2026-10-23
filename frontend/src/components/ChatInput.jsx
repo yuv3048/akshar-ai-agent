@@ -127,7 +127,7 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
           rows={2}
         />
 
-        <div className="order-2 flex w-full gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex w-full gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {agents.map((agent) => {
             const isActive = selectedAgent === agent.label;
             const Icon = agent.icon;
