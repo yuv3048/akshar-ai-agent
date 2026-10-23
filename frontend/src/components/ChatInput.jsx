@@ -6,7 +6,7 @@ import { addMessage, setArtifacts, setMessages } from "../redux/messageSlice";
 import { createConversation } from "../features/createConversation.js";
 import { addConversation, setConvTitle, setSelectedConversation } from "../redux/conversationSlice.js";
 
-function ChatInput({ suggestedAction = null, onSuggestionConsumed }) {
+function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChange }) {
   const [value, setValue] = useState("");
   const lastHandledAction = useRef(null);
   const [selectedAgent, setSelectedAgent] = useState("Auto");
@@ -20,6 +20,7 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed }) {
     if (!prompt || sending) return;
 
     setSending(true);
+    onSendingChange?.(true);
     setErrorMessage("");
 
     try {
@@ -70,6 +71,7 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed }) {
       );
     } finally {
       setSending(false);
+      onSendingChange?.(false);
     }
   };
 
