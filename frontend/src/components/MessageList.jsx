@@ -1,12 +1,13 @@
-import { Code2, FileText, Globe2, Presentation, Sparkles } from "lucide-react";
+import { Code2, FileText, Globe2, ImageIcon, Presentation, Sparkles } from "lucide-react";
 import { useSelector } from "react-redux";
 import MessageBubble from "./MessageBubble";
 
 const suggestions = [
-  { icon: Code2, label: "Build something", prompt: "Help me build a polished responsive website with HTML, CSS, and JavaScript.", detail: "Turn an idea into a working project" },
-  { icon: Globe2, label: "Explore a topic", prompt: "Explain how Redis works, with a practical example and when I should use it.", detail: "Learn with clear examples" },
-  { icon: FileText, label: "Create a document", prompt: "Create a downloadable PDF document: a well-structured beginner-friendly guide to system design, with clear sections, examples, and a concise summary.", detail: "Generate a PDF document", agent: "pdf", autoSend: true },
-  { icon: Presentation, label: "Create a presentation", prompt: "Create a PowerPoint presentation about system design for beginners, with a title slide, clear section slides, practical examples, and a conclusion.", detail: "Generate a PowerPoint presentation", agent: "ppt", autoSend: true },
+  { icon: Code2, label: "Build something", prompt: "Help me build a polished responsive website with HTML, CSS, and JavaScript.", detail: "Turn an idea into a working project", agent: "coding" },
+  { icon: Globe2, label: "Explore a topic", prompt: "Explain how Redis works, with a practical example and when I should use it.", detail: "Learn with clear examples", agent: "search" },
+  { icon: FileText, label: "Create a document", prompt: "Create a downloadable PDF document: a well-structured beginner-friendly guide to system design, with clear sections, examples, and a concise summary.", detail: "Generate a PDF document", agent: "pdf" },
+  { icon: Presentation, label: "Create a presentation", prompt: "Create a PowerPoint presentation about system design for beginners, with a title slide, clear section slides, practical examples, and a conclusion.", detail: "Generate a PowerPoint presentation", agent: "ppt" },
+  { icon: ImageIcon, label: "Create an image", prompt: "Create a high-quality image of a futuristic city at sunset, with cinematic lighting, detailed architecture, and a polished composition.", detail: "Generate an image from a prompt", agent: "vision" },
 ];
 
 function MessageList({ onSuggestionSelect }) {
@@ -30,11 +31,11 @@ function MessageList({ onSuggestionSelect }) {
           </p>
 
           <div className="mt-9 grid w-full max-w-4xl grid-cols-1 gap-3 text-left sm:grid-cols-2 lg:grid-cols-4">
-            {suggestions.map(({ icon: Icon, label, prompt, detail, agent, autoSend }) => (
+            {suggestions.map(({ icon: Icon, label, prompt, detail, agent }) => (
               <button
                 type="button"
                 key={label}
-                onClick={() => onSuggestionSelect?.({ prompt, agent, autoSend: Boolean(autoSend) })}
+                onClick={() => onSuggestionSelect?.({ prompt, agent })}
                 className="group rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-500/30 hover:bg-white/[0.045] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/60"
               >
                 <span className="mb-5 flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-slate-300 transition-colors group-hover:border-orange-500/20 group-hover:bg-orange-500/10 group-hover:text-orange-300">
