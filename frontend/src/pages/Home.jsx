@@ -1,4 +1,5 @@
 import GoogleIcon from '@mui/icons-material/Google';
+import { useState } from 'react';
 
 import { signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '../../utils/firebase';
@@ -14,6 +15,7 @@ function Home() {
 
     const {userData} = useSelector(state=>state.user)
     const dispatch = useDispatch()
+    const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
     const handleLogin = async (token) =>{
         try{
@@ -39,8 +41,8 @@ function Home() {
   return (
     <div className='h-screen flex bg-[#000000]  text-white overflow-hidden'>
    
-      <SideBar/>
-      <ChatArea/>
+      <SideBar mobileOpen={mobileSidebarOpen} onMobileClose={() => setMobileSidebarOpen(false)} />
+      <ChatArea onOpenSidebar={() => setMobileSidebarOpen(true)} />
       <Artifact/>
 
       {!userData &&  <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm'>
