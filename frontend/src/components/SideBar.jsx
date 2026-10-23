@@ -12,13 +12,12 @@ import { useEffect, useState } from "react";
 import { getConversations } from "../features/getConversations";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  addConversation,
   setConversations,
   setSelectedConversation,
 } from "../redux/conversationSlice";
-import { createConversation } from "../features/createConversation";
 import logOut from "../features/logOut.js";
 import { setUserdata } from "../redux/userSlice.js";
+import { setArtifacts, setMessages } from "../redux/messageSlice";
 
 function SideBar() {
   const [collapsed, setCollapsed] = useState(false);
@@ -61,20 +60,7 @@ function SideBar() {
   }, [userData?._id, dispatch]);
 
   
-  const handleCreateConversation = async () => {
-    try {
-      const conversation = await createConversation();
-    
-      if (!conversation?._id) {
-        throw new Error("Invalid conversation response");
-      }
-    
-      dispatch(addConversation(conversation));
-      dispatch(setSelectedConversation(conversation));
-    } catch (error) {
-      console.error("Failed to create conversation:", error);
-    }
-  };
+
 
   if (collapsed) {
     return (
@@ -97,7 +83,7 @@ function SideBar() {
           hover:test-slate-200 hover:bg-white/[0.05] transitions-colors duration-150 bg-transparent
           border-none cursor-pointer mb-1
           "
-          onClick={()=>dispatch(setSelectedConversation(null))}
+          onClick={() => { dispatch(setMessages([])); dispatch(setArtifacts([])); dispatch(setSelectedConversation(null)); }}
         >
           <MessageSquarePlus size={21} />
         </button>
@@ -119,7 +105,7 @@ function SideBar() {
                         ? "bg-orange-500/10 border-red-500/[0.18]"
                         : "bg-transparent border-transparent"
                     }`}
-                onClick={() => dispatch(setSelectedConversation(conv))}
+                onClick={() => { dispatch(setMessages([])); dispatch(setArtifacts([])); dispatch(setSelectedConversation(conv)); }}
               >
                 <div
                   className={`flex items-center justify-center shrink-0 w-[20px] h-[20px]
