@@ -9,8 +9,8 @@ import { setArtifacts, setMessages } from "../redux/messageSlice";
 function ChatArea() {
   const { selectedConversation } = useSelector((state) => state.conversation);
   const dispatch = useDispatch();
-  const [suggestedPrompt, setSuggestedPrompt] = useState("");
-  const clearSuggestedPrompt = useCallback(() => setSuggestedPrompt(""), []);
+  const [suggestedAction, setSuggestedAction] = useState(null);
+  const clearSuggestedAction = useCallback(() => setSuggestedAction(null), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -59,10 +59,12 @@ function ChatArea() {
   return (
     <div className="flex-1 flex flex-col min-w-0">
       <Nav />
-      <MessageList onSuggestionSelect={setSuggestedPrompt} />
+      <MessageList onSuggestionSelect={setSuggestedAction} />
       <ChatInput
-        suggestedPrompt={suggestedPrompt}
-        onSuggestionConsumed={clearSuggestedPrompt}
+        suggestedPrompt={suggestedAction?.prompt ?? ""}
+        suggestedAgent={suggestedAction?.agent ?? ""}
+        suggestedAutoSend={suggestedAction?.autoSend ?? false}
+        onSuggestionConsumed={clearSuggestedAction}
       />
     </div>
   );
