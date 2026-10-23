@@ -133,7 +133,7 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
               </button>
             );
           })}
-        </div
+        </div>
 
         <textarea
           placeholder="Ask anything..."
@@ -150,7 +150,6 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
           rows={2}
         />
 
->
 
         {errorMessage && (
           <p role="alert" className="px-1 text-xs text-red-400">{errorMessage}</p>
