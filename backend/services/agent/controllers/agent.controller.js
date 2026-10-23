@@ -25,7 +25,7 @@ const generateConversationTitle = async (prompt) => {
 
 export const agent = async (req, res) => {
   try {
-    const { prompt, conversationId, agent: requestedAgent } = req.body;
+    const { prompt, conversationId, agent: requestedAgent, generateTitle = false } = req.body;
     const userId = req.headers["x-user-id"];
 
     if (!userId) return res.status(401).json({ message: "User ID missing" });
@@ -85,16 +85,18 @@ export const agent = async (req, res) => {
     // Only the first message may set the title. The chat service enforces both
     // ownership and the "New Chat" condition atomically.
     let title = null;
-    try {
-      const titleResponse = await axios.post(
-        `${process.env.CHAT_SERVICE_URL}/update-conversation`,
-        { id: conversationId, title: await generateConversationTitle(prompt.trim()), onlyIfNew: true },
-        { headers: { "x-user-id": userId } }
-      );
-      title = titleResponse.data?.title || null;
-    } catch (error) {
-      // A title failure should not discard an otherwise successful answer.
-      console.error("Conversation title generation failed:", error.response?.data || error.message);
+    if (generateTitle === true) {
+      try {
+        const titleResponse = await axios.post(
+          `${process.env.CHAT_SERVICE_URL}/update-conversation`,
+          { id: conversationId, title: await generateConversationTitle(prompt.trim()), onlyIfNew: true },
+          { headers: { "x-user-id": userId } }
+        );
+        title = titleResponse.data?.title || null;
+      } catch (error) {
+        // A title failure should not discard an otherwise successful answer.
+        console.error("Conversation title generation failed:", error.response?.data || error.message);
+      }
     }
 
     return res.status(200).json({
