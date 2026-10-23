@@ -4,9 +4,9 @@ import {
   LogOut,
   MessageSquarePlus,
   MessageSquareText,
-  PanelLeftDashed,
-  PanelRightDashed,
-  SquarePen,
+  PanelLeft,
+  PanelRight,
+
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getConversations } from "../features/getConversations";
@@ -21,7 +21,7 @@ import logOut from "../features/logOut.js";
 import { setUserdata } from "../redux/userSlice.js";
 import { setArtifacts, setMessages } from "../redux/messageSlice";
 
-function SideBar() {
+function SideBar({ mobileOpen = false, onMobileClose }) {
   const [collapsed, setCollapsed] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [creatingConversation, setCreatingConversation] = useState(false);
@@ -84,112 +84,62 @@ function SideBar() {
 
   if (collapsed) {
     return (
-      <div
-        className="hidden lg:flex flex-col items-center w-[56px] h-screen bg-[#050505]
-      border-r border-white/[0.06] py-4 gap-1 shrink-0"
-      >
+      <aside className="hidden lg:flex h-screen w-14 shrink-0 flex-col items-center gap-2 border-r border-white/[0.06] bg-[#050505] py-4">
         <button
-          className="flex items-center justify-center w-9 h-9 rounded-xl text-slate-500
-          hover:text-slate-200 hover:bg-white/[0.05] transition-colors duration-150 bg-transparent
-          border-none cursor-pointer mb-1
-          "
+          type="button"
+          aria-label="Expand sidebar"
+          title="Expand sidebar"
+          className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-orange-300"
           onClick={() => setCollapsed(false)}
         >
-          <PanelRightDashed />
+          <PanelRight size={19} />
         </button>
-
         <button
-          className="flex items-center justify-center w-9 h-9 rounded-xl text-slate-500
-          hover:test-slate-200 hover:bg-white/[0.05] transitions-colors duration-150 bg-transparent
-          border-none cursor-pointer mb-1
-          "
-          onClick={handleNewChat}
+          type="button"
+          aria-label="New chat"
+          title="New chat"
           disabled={creatingConversation}
+          className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 transition-colors hover:bg-orange-500/10 hover:text-orange-300 disabled:opacity-50"
+          onClick={handleNewChat}
         >
-          <MessageSquarePlus size={21} />
+          <MessageSquarePlus size={19} />
         </button>
-
-        <div className="mx-2.5 h-px bg-white/[0.06]" />
-
-        <div
-          className="flex-1 overflow-y-auto px-2.5 pb-2 [scrollbar-width:none]
-          [&::-webkit-scrollbar]:hidden pt-5"
-        >
-          {conversations.map((conv, i) => {
-            const isActive = selectedConversation?._id == conv?._id;
-            return (
-              <div
-                key={conv._id}
-                className={`flex items-center gap-2.5 cursor-pointer mb-0.5 px-3 py-2.5 font-inter rounded-[10px] border transition-colors duration-150 
-                    ${
-                      isActive
-                        ? "bg-orange-500/10 border-red-500/[0.18]"
-                        : "bg-transparent border-transparent"
-                    }`}
-                onClick={() => { dispatch(setMessages([])); dispatch(setArtifacts([])); dispatch(setSelectedConversation(conv)); }}
-              >
-                <div
-                  className={`flex items-center justify-center shrink-0 w-[20px] h-[20px]
-                          rounded-lg transition-colors duration-150 ${
-                            isActive
-                              ? "bg-red-700/15 text-orange-600"
-                              : "bg-white/[0.05] text-slate-500"
-                          }`}
-                >
-                  <MessageSquareText size={15} />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="relative shrink-0">
-          {userData?.avatar && !imageError ? (
-            <img
-              src={userData?.avatar}
-              alt={"image"}
-              onError={() => setImageError(true)}
-              className="w-9 h-9 rounded-[10px] object-cover border-2 border-orange-600/25"
-            />
-          ) : (
-            <div className="flex justify-center items-center w-9 h-9 rounded-[10px] object-cover border-2 border-orange-600/25">
-              <CircleUserRound size={15} className="text-slate-400" />
-            </div>
-          )}
-        </div>
-      </div>
+      </aside>
     );
   }
 
   return (
-    <div className="fixed lg:static inset-y-0 left-0 z-50 w-[270px] h-screen shrink-0 bg-[#050505] border-r border-white/[0.06]">
+    <>
+      {mobileOpen && (
+        <button
+          type="button"
+          aria-label="Close sidebar"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-[2px] lg:hidden"
+          onClick={onMobileClose}
+        />
+      )}
+      <aside className={`fixed inset-y-0 left-0 z-50 h-screen w-[270px] shrink-0 border-r border-white/[0.06] bg-[#050505] transition-transform duration-200 lg:static lg:translate-x-0 ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
       <div className="flex flex-col h-full">
-        <div className="flex items-center gap-2.5  px-4 py-5 border-b border-white/[0.06]">
-          <div
-            className="hidden lg:flex items-center justify-center w-7 h-7 rounded-lg
-            text-slate-500 hover:text-slate-200 hover:bg-white/[005]
-            transition-colors duration-150 bg-transparent border-none cursor-pointer
-            "
+        <div className="flex items-center gap-2.5 px-4 py-5 border-b border-white/[0.06]">
+          <button
+            type="button"
+            aria-label="Collapse sidebar"
+            title="Collapse sidebar"
+            className="hidden lg:flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-orange-300"
             onClick={() => setCollapsed(true)}
           >
-            <PanelLeftDashed size={20} />
-          </div>
+            <PanelLeft size={19} />
+          </button>
           <span className="font-doto text-[20px] font-bold text-slate-300 flex-1">
             Akshar AI
           </span>
-          <span
-            className="text-[12px] font-medium font-inter text-green-600 bg-yellow-700/10 border border
-              border-green-950/20 px-2 py-0.5 rounded-full tracking-wiee"
-          >
-            free
-          </span>
           <button
-            className="flex items-center justify-center w-7 rounded-lg text-slate-500 hover:text-slate-200
-              hover:bg-white/[0.05] transition-colors duration-150 bg-transparent border-none cursor-pointer
-              "
-            onClick={handleNewChat}
+            type="button"
+            aria-label="Close sidebar"
+            className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-slate-200 lg:hidden"
+            onClick={onMobileClose}
           >
-            <SquarePen size={15} />
+            <PanelLeft size={19} />
           </button>
         </div>
 
@@ -199,7 +149,7 @@ function SideBar() {
                 bg-linear-to-br from-red-600 to-orange-700 rounded-4xl hover:from-orange-700 hover:to-red-600  
                                 border border-red-950 py-[10px] cursor-pointer hover:shadow-[0_1px_8px_rgba(234,70,35,0.35)] 
                 transition-opacity duration-150"
-            onClick={handleNewChat}
+            onClick={async () => { await handleNewChat(); onMobileClose?.(); }}
             disabled={creatingConversation}
           >
             <MessageSquarePlus size={20} />
@@ -232,7 +182,7 @@ function SideBar() {
                         ? "bg-orange-500/10 border-red-500/[0.18] rounded-r-lg border-l-2 border-l-orange-600"
                         : "bg-transparent border-transparent"
                     }`}
-                onClick={() => { dispatch(setMessages([])); dispatch(setArtifacts([])); dispatch(setSelectedConversation(conv)); }}
+                onClick={() => { dispatch(setMessages([])); dispatch(setArtifacts([])); dispatch(setSelectedConversation(conv)); onMobileClose?.(); }}
               >
                 <div
                   className={`flex items-center justify-center shrink-0 w-[28px] h-[28px]
@@ -319,7 +269,8 @@ function SideBar() {
           )}
         </div>
       </div>
-    </div>
+      </aside>
+    </>
   );
 }
 
