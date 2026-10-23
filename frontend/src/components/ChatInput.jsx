@@ -82,9 +82,14 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed }) {
     if (!prompt) return;
 
     setValue(prompt);
-    if (agent === "pdf") setSelectedAgent("PDF");
-    else if (agent === "ppt") setSelectedAgent("PPT");
-    else if (agent) setSelectedAgent(agent);
+    const agentLabels = {
+      coding: "Coding",
+      search: "Search",
+      pdf: "PDF",
+      ppt: "PPT",
+      vision: "Vision",
+    };
+    if (agentLabels[agent]) setSelectedAgent(agentLabels[agent]);
 
     onSuggestionConsumed?.();
   }, [suggestedAction, onSuggestionConsumed]);
