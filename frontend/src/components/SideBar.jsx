@@ -10,8 +10,10 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getConversations } from "../features/getConversations";
+import { createConversation } from "../features/createConversation.js";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  addConversation,
   setConversations,
   setSelectedConversation,
 } from "../redux/conversationSlice";
@@ -22,6 +24,7 @@ import { setArtifacts, setMessages } from "../redux/messageSlice";
 function SideBar() {
   const [collapsed, setCollapsed] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [creatingConversation, setCreatingConversation] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -29,6 +32,23 @@ function SideBar() {
     (state) => state.conversation,
   );
   const { userData } = useSelector((state) => state.user);
+
+  const handleNewChat = async () => {
+    if (creatingConversation) return;
+
+    setCreatingConversation(true);
+    try {
+      const conversation = await createConversation();
+      dispatch(addConversation(conversation));
+      dispatch(setMessages([]));
+      dispatch(setArtifacts([]));
+      dispatch(setSelectedConversation(conversation));
+    } catch (error) {
+      console.error("Failed to create new chat:", error.response?.data || error.message);
+    } finally {
+      setCreatingConversation(false);
+    }
+  };
 
   useEffect(() => {
   let cancelled = false;
@@ -83,7 +103,8 @@ function SideBar() {
           hover:test-slate-200 hover:bg-white/[0.05] transitions-colors duration-150 bg-transparent
           border-none cursor-pointer mb-1
           "
-          onClick={() => { dispatch(setMessages([])); dispatch(setArtifacts([])); dispatch(setSelectedConversation(null)); }}
+          onClick={handleNewChat}
+          disabled={creatingConversation}
         >
           <MessageSquarePlus size={21} />
         </button>
@@ -166,7 +187,7 @@ function SideBar() {
             className="flex items-center justify-center w-7 rounded-lg text-slate-500 hover:text-slate-200
               hover:bg-white/[0.05] transition-colors duration-150 bg-transparent border-none cursor-pointer
               "
-            onClick={() => { dispatch(setMessages([])); dispatch(setArtifacts([])); dispatch(setSelectedConversation(null)); }}
+            onClick={handleNewChat}
           >
             <SquarePen size={15} />
           </button>
@@ -178,7 +199,8 @@ function SideBar() {
                 bg-linear-to-br from-red-600 to-orange-700 rounded-4xl hover:from-orange-700 hover:to-red-600  
                                 border border-red-950 py-[10px] cursor-pointer hover:shadow-[0_1px_8px_rgba(234,70,35,0.35)] 
                 transition-opacity duration-150"
-            onClick={() => { dispatch(setMessages([])); dispatch(setArtifacts([])); dispatch(setSelectedConversation(null)); }}
+            onClick={handleNewChat}
+            disabled={creatingConversation}
           >
             <MessageSquarePlus size={20} />
             New Chat
