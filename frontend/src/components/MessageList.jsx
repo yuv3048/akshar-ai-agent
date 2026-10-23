@@ -1,4 +1,5 @@
 import { Code2, FileText, Globe2, ImageIcon, Presentation, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import MessageBubble from "./MessageBubble";
 
@@ -10,10 +11,41 @@ const suggestions = [
   { icon: ImageIcon, label: "Create an image", prompt: "Create a high-quality image of a futuristic city at sunset, with cinematic lighting, detailed architecture, and a polished composition.", detail: "Generate an image from a prompt", agent: "vision" },
 ];
 
+function getRandomSuggestions(previous = []) {
+  const combinations = [];
+
+  for (let i = 0; i < suggestions.length; i++) {
+    for (let j = i + 1; j < suggestions.length; j++) {
+      for (let k = j + 1; k < suggestions.length; k++) {
+        combinations.push([suggestions[i], suggestions[j], suggestions[k]]);
+      }
+    }
+  }
+
+  const previousKey = previous.map(({ label }) => label).sort().join("|");
+  const available = combinations.filter(
+    (combination) => combination.map(({ label }) => label).sort().join("|") !== previousKey
+  );
+  const pool = available.length ? available : combinations;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
 function MessageList({ onSuggestionSelect }) {
   const { selectedConversation } = useSelector((state) => state.conversation);
   const { messages } = useSelector((state) => state.message);
   const isEmpty = !selectedConversation || messages.length === 0;
+  const [visibleSuggestions, setVisibleSuggestions] = useState(() => getRandomSuggestions());
+  const [isHoveringSuggestions, setIsHoveringSuggestions] = useState(false);
+
+  useEffect(() => {
+    if (isHoveringSuggestions) return;
+
+    const intervalId = setInterval(() => {
+      setVisibleSuggestions((current) => getRandomSuggestions(current));
+    }, 3000);
+
+    return () => clearInterval(intervalId);
+  }, [isHoveringSuggestions]);
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto px-3 py-5 sm:px-6 sm:py-8 [scrollbar-width:thin] [scrollbar-color:#27272a_transparent]">
@@ -30,13 +62,17 @@ function MessageList({ onSuggestionSelect }) {
             Welcome to Akshar AI. Research ideas, solve problems, write code, or create something new.
           </p>
 
-          <div className="mt-9 flex w-full max-w-full flex-nowrap gap-3 overflow-x-auto pb-3 text-left [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {suggestions.map(({ icon: Icon, label, prompt, detail, agent }) => (
+          <div
+            className="mt-9 flex w-full max-w-full flex-nowrap gap-3 text-left"
+            onMouseEnter={() => setIsHoveringSuggestions(true)}
+            onMouseLeave={() => setIsHoveringSuggestions(false)}
+          >
+            {visibleSuggestions.map(({ icon: Icon, label, prompt, detail, agent }) => (
               <button
                 type="button"
                 key={label}
                 onClick={() => onSuggestionSelect?.({ prompt, agent })}
-                className="group w-44 min-w-44 shrink-0 rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-500/30 hover:bg-white/[0.045] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/60 sm:w-48 sm:min-w-48"
+                className="group min-w-0 flex-1 rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 text-left transition-all duration-300 hover:-translate-y-0.5 hover:border-orange-500/30 hover:bg-white/[0.045] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/60"
               >
                 <span className="mb-5 flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-slate-300 transition-colors group-hover:border-orange-500/20 group-hover:bg-orange-500/10 group-hover:text-orange-300">
                   <Icon size={17} />
