@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux"
-import { BotMessageSquare, PanelLeft } from "lucide-react"
+import { PanelLeft } from "lucide-react"
 
 function Nav({ onOpenSidebar }) {
   const { selectedConversation } = useSelector(state => state.conversation)
@@ -18,9 +18,11 @@ function Nav({ onOpenSidebar }) {
         <PanelLeft size={18} />
       </button>
 
-      <div className="flex items-center justify-center w-8 h-7 rounded-lg bg-orange-600/10 border border-red-700/20 shrink-0">
-        <BotMessageSquare size={18} className="text-orange-600" />
-      </div>
+      <img
+        src="/akshar-logo.svg"
+        alt="Akshar AI logo"
+        className="h-8 w-8 shrink-0 object-contain"
+      />
 
       <span className="font-space font-semibold text-sm tracking-wide text-slate-100 min-w-0 flex-1 truncate">
         {selectedConversation?.title || "Akshar AI"}
