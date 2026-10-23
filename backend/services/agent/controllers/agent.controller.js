@@ -46,8 +46,8 @@ export const agent = async (req, res) => {
       }
     );
 
-    await addMessage(conversationId, "user", prompt);
-    await addMessage(conversationId, "assistant", response);
+    await addMessage(conversationId, userId, "user", prompt);
+    await addMessage(conversationId, userId, "assistant", response);
 
     return res.status(200).json({
       answer:result?.aiResponse,

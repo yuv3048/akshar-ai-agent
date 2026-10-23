@@ -30,13 +30,21 @@ function MessageList() {
         )
           :
         (
-          <div className='space-y-5'>
-              {messages.map((msg, i)=>(
-                  <div key={msg._id ?? i}>
-                     <MessageBubble role={msg?.role} content={msg?.content} images={msg?.images || []}/>
-                  </div>
-              ))}
-          </div>
+          
+        <div className="space-y-5">
+          {messages.map((msg, i) => (
+            <div key={msg._id ?? i}>
+              <MessageBubble
+                role={msg?.role}
+                content={msg?.content}
+                images={msg?.images || []}
+                assetPreviewUrl={msg?.artifacts?.previewUrl}
+                assetDownloadUrl={msg?.artifacts?.downloadUrl}
+              />
+            </div>
+          ))}
+        </div>
+
         )}
     </div>
   )

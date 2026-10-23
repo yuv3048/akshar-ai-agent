@@ -5,7 +5,7 @@ import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter} from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-function MessageBubble({role, content, images}) {
+function MessageBubble({role, content, images, assetPreviewUrl, assetDownloadUrl}) {
 
   const isUser = role === "user"
 
@@ -116,48 +116,52 @@ function MessageBubble({role, content, images}) {
               </td>
             ),
             a: ({ href, children }) => {
-  const label =
-    typeof children === "string"
-      ? children.toLowerCase()
-      : Array.isArray(children)
-        ? children.map((child) =>
-            typeof child === "string" ? child : ""
-          ).join("").toLowerCase()
-        : "";
+              const isAssetPreview =
+                href && href === assetPreviewUrl;
 
-  const isDownload = label.includes("download");
-  const isPreview = label.includes("preview");
+              const isAssetDownload =
+                href && href === assetDownloadUrl;
 
-  if (isDownload || isPreview) {
-    return (
-      <a
-        href={href || "#"}
-        target={isPreview ? "_blank" : undefined}
-        rel={isPreview ? "noopener noreferrer" : undefined}
-        className="mr-2 inline-flex items-center gap-2 rounded-4xl
-          bg-black font-space border border-orange-600
-          px-4 py-2.5 font-medium text-slate-300 no-underline
-          transition hover:brightness-110 hover:text-slate-100"
-      >
-        {isDownload ? <Download size={17} /> : <Eye size={17} />}
-        {children}
-      </a>
-    );
-  }
-
-  return (
-    <a
-      href={href || "#"}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-orange-600 font-medium underline
-        inline-flex items-center gap-1"
-    >
-      {children}
-      <ExternalLink size={14} />
-    </a>
-  );
-},
+              // Generated asset buttons
+              if (isAssetPreview || isAssetDownload) {
+                return (
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mr-2 inline-flex items-center gap-2 rounded-4xl
+                      bg-black font-space border border-orange-600
+                      px-4 py-2.5 font-medium text-slate-300 no-underline
+                      transition hover:brightness-110 hover:text-slate-100"
+                  >
+                    {isAssetPreview ? (
+                      <Eye size={17} />
+                    ) : (
+                      <Download size={17} />
+                    )}
+                    {children}
+                  </a>
+                );
+              }
+            
+              // Normal links and research sources
+              return (
+                <a
+                  href={href || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-orange-600
+                    font-medium underline"
+                >
+                  {children}
+                  <ExternalLink
+                    size={13}
+                    className="inline shrink-0"
+                    aria-hidden="true"
+                  />
+                </a>
+              );
+            },
             hr: () => (
               <hr className="my-6 h-px border-0
                 bg-gradient-to-r
