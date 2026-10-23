@@ -49,14 +49,14 @@ function MessageList({ onSuggestionSelect }) {
     <div className="min-h-0 flex-1 overflow-y-auto px-3 py-5 sm:px-6 sm:py-8 [scrollbar-width:thin] [scrollbar-color:#27272a_transparent]">
       {isEmpty ? (
         <div className="mx-auto flex min-h-full w-full max-w-4xl flex-col items-center justify-center py-8 text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/[0.06] px-3 py-1.5 text-[11px] font-medium tracking-wide text-orange-300">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/[0.06] px-3 py-1.5 font-doto text-[11px] font-bold tracking-widest text-orange-300">
             <Sparkles size={13} />
             YOUR AI WORKSPACE
           </div>
-          <h1 className="font-space text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+          <h1 className="font-vt323 text-6xl font-normal tracking-wide text-white sm:text-7xl">
             Think it. <span className="bg-linear-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">Build it.</span>
           </h1>
-          <p className="mt-4 max-w-lg text-sm leading-6 text-slate-400 sm:text-base">
+          <p className="mt-4 max-w-lg font-space text-sm leading-6 text-slate-400 sm:text-base">
             Welcome to Akshar AI. Research ideas, solve problems, write code, or create something new.
           </p>
 
