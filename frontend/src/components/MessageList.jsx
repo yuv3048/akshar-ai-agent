@@ -30,13 +30,13 @@ function MessageList({ onSuggestionSelect }) {
             Welcome to Akshar AI. Research ideas, solve problems, write code, or create something new.
           </p>
 
-          <div className="mt-9 grid w-full max-w-4xl grid-cols-1 gap-3 text-left sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-9 flex w-full max-w-full gap-3 overflow-x-auto pb-3 text-left [scrollbar-width:thin] [scrollbar-color:#3f3f46_transparent]">
             {suggestions.map(({ icon: Icon, label, prompt, detail, agent }) => (
               <button
                 type="button"
                 key={label}
                 onClick={() => onSuggestionSelect?.({ prompt, agent })}
-                className="group rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-500/30 hover:bg-white/[0.045] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/60"
+                className="group w-44 min-w-44 shrink-0 rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-500/30 hover:bg-white/[0.045] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/60 sm:w-48 sm:min-w-48"
               >
                 <span className="mb-5 flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-slate-300 transition-colors group-hover:border-orange-500/20 group-hover:bg-orange-500/10 group-hover:text-orange-300">
                   <Icon size={17} />
