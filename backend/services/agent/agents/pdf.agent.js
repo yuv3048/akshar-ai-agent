@@ -2,7 +2,6 @@ import { randomUUID } from "node:crypto";
 import { getModel } from "../config/llmModel.js";
 import { generatePdf } from "../utils/generatePdf.js";
 import { uploadToS3 } from "../utils/uploadToS3.js";
-import { getFromS3 } from "../utils/getFromS3.js";
 import redis from "../../../shared/redis/redis.js";
 
 export const pdfAgent = async (state) => {
