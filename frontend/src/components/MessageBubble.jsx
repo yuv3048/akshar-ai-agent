@@ -1,5 +1,5 @@
 import Markdown from 'react-markdown'
-import { Check, Copy, ExternalLink, X } from "lucide-react";
+import { Check, Copy, Download, ExternalLink, X } from "lucide-react";
 import { useState } from 'react';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter} from 'react-syntax-highlighter';
@@ -115,17 +115,37 @@ function MessageBubble({role, content, images}) {
                 {children}
               </td>
             ),
-           a: ({ href, children }) => (
-              <a
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-orange-600 font-medium underline inline-flex items-center gap-1"
-              >
-                {children}
-                <ExternalLink size={14} />
-              </a>
-            ),
+            a: ({ href, children }) => {
+              const isDownload = String(children).toLowerCase().includes("download");
+            
+              if (isDownload) {
+                return (
+                  <a
+                    href={href}
+                    className="my-3 inline-flex items-center gap-2 rounded-4xl
+                      bg-black font-space border border-orange-600
+                      px-4 py-2.5 font-medium text-slate-300 no-underline transition
+                      hover:brightness-110 hover:text-slate-100"
+                  >
+                    <Download size={17} />
+                    {children}
+                  </a>
+                );
+              }
+            
+              return (
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-orange-600 font-medium underline
+                    inline-flex items-center gap-1"
+                >
+                  {children}
+                  <ExternalLink size={14} />
+                </a>
+              );
+            },
             hr: () => (
               <hr className="my-6 h-px border-0
                 bg-gradient-to-r
