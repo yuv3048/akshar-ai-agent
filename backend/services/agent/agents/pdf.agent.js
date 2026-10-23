@@ -64,6 +64,7 @@ ${state.prompt}
       604800
     );
 
+    const aksharAiPreviewUrl = `${baseUrl}/api/agent/preview/${encodeURIComponent(filename)}`;
     const aksharAiDownloadUrl = `${baseUrl}/api/agent/images/${encodeURIComponent(filename)}`;
 
     return {
@@ -73,7 +74,7 @@ ${state.prompt}
 
 **${data.title}**
 
-[**Download PDF**](${aksharAiDownloadUrl})
+[**Preview PDF**](${aksharAiPreviewUrl}) [**Download PDF**](${aksharAiDownloadUrl})
 
 _Available for 7 days._
 `,
