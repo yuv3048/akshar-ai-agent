@@ -205,10 +205,10 @@ await redis.set(
   604800
 );
 
-const previewUrl =
+const aksharAiPreviewUrl =
   `${baseUrl}/api/agent/preview/${encodeURIComponent(filename)}`;
 
-const downloadUrl =
+const aksharAiDownloadUrl =
   `${baseUrl}/api/agent/images/${encodeURIComponent(filename)}`;
 
 return {
@@ -216,9 +216,9 @@ return {
   aiResponse: `
 # 🖼️ Image Generated Successfully
 
-![Generated Image](${previewUrl})
+![Generated Image](${aksharAiPreviewUrl})
 
-[Download Image](${downloadUrl})
+[**Download Image**](${aksharAiDownloadUrl})
 
 _Available for 7 days._
 `,
