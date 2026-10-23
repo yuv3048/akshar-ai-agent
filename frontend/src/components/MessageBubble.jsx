@@ -32,7 +32,7 @@ function MessageBubble({role, content, images, assetPreviewUrl, assetDownloadUrl
 
   return (
     <div className={`flex ${isUser? "justify-end" : "justify-start"}`}>
-      <div className={`max-w-[92vw] md:max-w-[72%] px-4 py-2.5 rounded-2xl font-inter break-words overflow-hidden leading-relaxed
+      <div className={`max-w-[92vw] ${isUser ? "md:max-w-[72%]" : "w-full max-w-full"} px-4 py-2.5 rounded-2xl font-inter break-words overflow-hidden leading-relaxed
         ${isUser?
           'my-2 font-inter bg-linear-to-r from-red-600 to-orange-700 text-white rounded-tr-sm'
           : 
