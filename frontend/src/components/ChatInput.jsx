@@ -6,7 +6,7 @@ import { addMessage, setArtifacts, setMessages } from "../redux/messageSlice";
 import { createConversation } from "../features/createConversation.js";
 import { addConversation, setConvTitle, setSelectedConversation } from "../redux/conversationSlice.js";
 
-function ChatInput({ suggestedPrompt = "", onSuggestionConsumed }) {
+function ChatInput({ suggestedPrompt = "", suggestedAgent = "", suggestedAutoSend = false, onSuggestionConsumed }) {
   const [value, setValue] = useState("");
   const [selectedAgent, setSelectedAgent] = useState("Auto");
   const [sending, setSending] = useState(false);
@@ -17,11 +17,17 @@ function ChatInput({ suggestedPrompt = "", onSuggestionConsumed }) {
   useEffect(() => {
     if (!suggestedPrompt) return;
     setValue(suggestedPrompt);
+    if (suggestedAgent === "pdf") setSelectedAgent("PDF");
+    else if (suggestedAgent === "ppt") setSelectedAgent("PPT");
+    else if (suggestedAgent) setSelectedAgent(suggestedAgent);
     onSuggestionConsumed?.();
-  }, [suggestedPrompt, onSuggestionConsumed]);
+    if (suggestedAutoSend) {
+      void handleSendMessage(suggestedPrompt, suggestedAgent);
+    }
+  }, [suggestedPrompt, suggestedAgent, suggestedAutoSend, onSuggestionConsumed]);
 
-  const handleSendMessage = async () => {
-    const prompt = value.trim();
+  const handleSendMessage = async (promptOverride, agentOverride) => {
+    const prompt = (promptOverride ?? value).trim();
     if (!prompt || sending) return;
 
     setSending(true);
@@ -46,7 +52,7 @@ function ChatInput({ suggestedPrompt = "", onSuggestionConsumed }) {
       const data = await sendMessage({
         prompt,
         conversationId: conversation._id,
-        agent: selectedAgent.toLowerCase(),
+        agent: (agentOverride || selectedAgent).toLowerCase(),
         generateTitle: conversation.title === "New Chat",
       });
 
