@@ -30,6 +30,7 @@ export const agent = async (req, res) => {
       prompt,
       conversationId,
       userId,
+      agent: agent || "auto",
     });
 
     const response = result?.aiResponse;
