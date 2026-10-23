@@ -131,11 +131,10 @@ function MessageBubble({role, content, images, assetPreviewUrl, assetDownloadUrl
                     download
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="my-2 mr-2 inline-flex items-center gap-2 rounded-xl
-                      bg-linear-to-r from-orange-600 to-red-700
-                      px-4 py-2.5 font-space font-semibold text-white no-underline
-                      shadow-[0_2px_12px_rgba(234,70,35,0.2)]
-                      transition hover:brightness-110"
+                    className="mr-2 inline-flex items-center gap-2 rounded-4xl
+                      border border-orange-700 px-4 py-2.5 font-space
+                      font-medium text-slate-300 no-underline
+                      transition hover:brightness-110 hover:text-slate-100"
                   >
                     <Download size={17} />
                     Download {href.toLowerCase().endsWith(".pdf") ? "PDF" : "Image"}
@@ -149,8 +148,8 @@ function MessageBubble({role, content, images, assetPreviewUrl, assetDownloadUrl
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mr-2 inline-flex items-center gap-2 rounded-xl
-                      border border-orange-600 px-4 py-2.5 font-space
+                    className="mr-2 inline-flex items-center gap-2 rounded-4xl
+                      border border-orange-700 px-4 py-2.5 font-space
                       font-medium text-slate-300 no-underline
                       transition hover:brightness-110 hover:text-slate-100"
                   >
