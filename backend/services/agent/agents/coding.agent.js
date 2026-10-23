@@ -226,6 +226,85 @@ Return the complete project now.
 `;
 }
 
+function getFallbackFiles(userPrompt) {
+  const wantsNext = /\\bnext(?:\\.js)?\\b/i.test(userPrompt);
+  const wantsReact = /\\breact\\b/i.test(userPrompt);
+
+  if (wantsNext) {
+    return [
+      "package.json",
+      "app/page.jsx",
+      "app/layout.jsx",
+      "app/globals.css",
+    ];
+  }
+
+  if (wantsReact) {
+    return [
+      "package.json",
+      "index.html",
+      "src/main.jsx",
+      "src/App.jsx",
+      "src/App.css",
+      "src/index.css",
+    ];
+  }
+
+  return ["index.html", "style.css", "script.js"];
+}
+
+function stripCodeFence(content) {
+  const trimmed = content.trim();
+  const match = trimmed.match(/^\`\`\`(?:[\\w.+-]+)?\\s*\\n([\\s\\S]*?)\\n\`\`\`$/);
+  return match ? match[1] : trimmed;
+}
+
+async function generateProjectInParts(llm, userPrompt) {
+  const fileNames = getFallbackFiles(userPrompt);
+  const files = [];
+
+  console.warn("Generating project file-by-file after output limit.");
+
+  for (const fileName of fileNames) {
+    const response = await llm.invoke(`
+You are Akshar AI's coding agent. Generate ONLY the complete source content for this one file:
+FILE: ${fileName}
+
+USER REQUEST:
+<user_request>
+${userPrompt}
+</user_request>
+
+PROJECT FILES:
+${fileNames.map((name) => `- ${name}`).join("\\n")}
+
+Requirements:
+- This is one part of a coherent, runnable project. Match the other files and use the listed paths.
+- Implement a polished, responsive food-delivery website if that is the user's request, including useful working interactions rather than static mock controls.
+- Follow the user's explicit technology choice. For plain websites, use vanilla HTML, CSS, and JavaScript.
+- Do not repeat the user's request instead of code.
+- Do not omit core behavior or replace it with TODOs/placeholders.
+- Keep code focused on this file; import/reference only the listed project files.
+- Return raw source code only. No JSON wrapper, Markdown fences, or explanations.
+`);
+
+    const finishReason = getFinishReason(response);
+    if (finishReason === "length" || finishReason === "max_tokens") {
+      throw new Error(`The coding model also reached its output limit while generating ${fileName}. Try a smaller requested feature set or a model with a larger output limit.`);
+    }
+
+    const content = stripCodeFence(contentToString(response.content));
+    if (!content.trim()) {
+      throw new Error(`The coding model returned empty content for ${fileName}.`);
+    }
+
+    files.push({ name: fileName, content });
+  }
+
+  const project = { files };
+  return validateProject(project, userPrompt);
+}
+
 async function generateProject(llm, userPrompt) {
   let response = await llm.invoke(buildGenerationPrompt(userPrompt));
 
@@ -247,10 +326,7 @@ async function generateProject(llm, userPrompt) {
   }
 
   if (finishReason === "length" || finishReason === "max_tokens") {
-    throw new Error(
-      "The coding model reached its output-token limit twice. " +
-        "Increase maxTokens or generate the project in smaller parts."
-    );
+    return generateProjectInParts(llm, userPrompt);
   }
 
   try {
@@ -262,9 +338,9 @@ async function generateProject(llm, userPrompt) {
     console.error("Coding output JSON parse failed:", error.message);
     console.error("Raw output tail:", raw.slice(-500));
 
-    throw new Error(
-      "The coding model returned invalid JSON. Please retry the request."
-    );
+    // A truncated/malformed project response can still be recovered by
+    // generating each existing project file independently.
+    return generateProjectInParts(llm, userPrompt);
   }
 }
 
