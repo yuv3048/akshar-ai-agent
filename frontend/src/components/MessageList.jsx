@@ -12,22 +12,20 @@ const suggestions = [
 ];
 
 function getRandomSuggestions(previous = []) {
-  const combinations = [];
-
-  for (let i = 0; i < suggestions.length; i++) {
-    for (let j = i + 1; j < suggestions.length; j++) {
-      for (let k = j + 1; k < suggestions.length; k++) {
-        combinations.push([suggestions[i], suggestions[j], suggestions[k]]);
-      }
-    }
-  }
-
-  const previousKey = previous.map(({ label }) => label).sort().join("|");
-  const available = combinations.filter(
-    (combination) => combination.map(({ label }) => label).sort().join("|") !== previousKey
+  const previousSet = new Set(
+    previous.map((suggestion) => suggestions.findIndex(({ label }) => label === suggestion.label))
   );
-  const pool = available.length ? available : combinations;
-  return pool[Math.floor(Math.random() * pool.length)];
+  let currentSet;
+
+  do {
+    currentSet = new Set();
+
+    while (currentSet.size < 3) {
+      currentSet.add(Math.floor(Math.random() * suggestions.length));
+    }
+  } while ([...currentSet].every((index) => previousSet.has(index)));
+
+  return [...currentSet].map((index) => suggestions[index]);
 }
 
 function MessageList({ onSuggestionSelect }) {
