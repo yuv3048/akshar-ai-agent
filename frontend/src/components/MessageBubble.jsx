@@ -137,7 +137,7 @@ function MessageBubble({role, content, images, assetPreviewUrl, assetDownloadUrl
                       transition hover:brightness-110 hover:text-slate-100"
                   >
                     <Download size={17} />
-                    Download {href.toLowerCase().endsWith(".pdf") ? "PDF" : /\\.pptx(?:$|[?#])/i.test(href) ? "PPT" : "Image"}
+                    Download {href.toLowerCase().endsWith(".pdf") ? "PDF" : /\.pptx(?:$|[?#])/i.test(href) ? "PPT" : "Image"}
                   </a>
                 );
               }
