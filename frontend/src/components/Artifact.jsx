@@ -1,5 +1,5 @@
 import { Check, ChevronLeft, ChevronRight, Code2, Copy, EyeDashed, PanelRightClose, PanelRightOpen } from 'lucide-react'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from "react-redux";
 import { easeInOut, motion } from "motion/react"
 import Editor from '@monaco-editor/react';
@@ -7,6 +7,7 @@ import Editor from '@monaco-editor/react';
 function Artifact() {
 
   const [collapsed, setCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   const {artifacts} = useSelector(state=>state.message)
 
@@ -16,6 +17,12 @@ function Artifact() {
 
   const [copied, setCopied] = useState(false)
 
+
+  useEffect(() => {
+    setMobileOpen(false);
+    setActiveFile(0);
+    setTab("code");
+  }, [artifacts[0]?.id]);
 
   if(artifacts.length === 0) return null;
 
@@ -108,6 +115,70 @@ function Artifact() {
 
 
   return (
+    <>
+      {/* Mobile artifact launcher: stays closed after generation to keep chat visible. */}
+      <div className="lg:hidden">
+        <button
+          type="button"
+          onClick={() => setMobileOpen(true)}
+          aria-label="Open artifact"
+          className="fixed bottom-5 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-orange-500/30 bg-[#111111] text-orange-400 shadow-lg shadow-black/40 transition hover:bg-[#1b1b1b]"
+        >
+          <Code2 size={21} />
+        </button>
+
+        {mobileOpen && (
+          <div className="fixed inset-0 z-50 flex h-[100dvh] w-full flex-col overflow-hidden bg-[#000000] text-white">
+            <header className="flex min-h-14 items-center gap-2 border-b border-white/10 px-3">
+              <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close artifact" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-300 hover:bg-white/10">
+                <PanelRightClose size={19} />
+              </button>
+              <Code2 size={17} className="shrink-0 text-orange-400" />
+              <h2 className="min-w-0 flex-1 truncate text-sm font-medium">{artifacts[0]?.title}</h2>
+              <button type="button" onClick={handleCopy} aria-label="Copy current file" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-300 hover:bg-white/10">
+                {copied ? <Check size={17} /> : <Copy size={17} />}
+              </button>
+            </header>
+
+            {tab === "code" && (
+              <div className="flex shrink-0 overflow-x-auto border-b border-white/10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {artifacts[0].files?.map((f, index) => (
+                  <button key={`${f.name}-mobile-${index}`} type="button" onClick={() => setActiveFile(index)} className={`relative shrink-0 border-r border-white/5 px-3 py-3 text-xs ${activeFile === index ? "text-orange-400" : "text-slate-400"}`}>
+                    {f.name}
+                    {activeFile === index && <span className="absolute inset-x-0 bottom-0 h-0.5 bg-orange-500" />}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <main className="min-h-0 flex-1 overflow-hidden">
+              {tab === "preview" && canPreview ? (
+                <iframe title="Artifact preview" srcDoc={previewDoc} sandbox="allow-scripts" className="h-full w-full border-0 bg-white" />
+              ) : (
+                <Editor theme="vs-dark" language={detectLanguage(file?.name)} value={file?.content ?? ""} options={{ readOnly: true, minimap: { enabled: false }, fontSize: 12, wordWrap: "on", automaticLayout: true, scrollBeyondLastLine: false, padding: { top: 12 }, lineNumbers: "on", renderLineHighlight: "none" }} />
+              )}
+            </main>
+
+            <footer className="flex shrink-0 flex-col gap-3 border-t border-white/10 bg-[#080808] p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+              <div className="flex items-center justify-between gap-2">
+                <button type="button" onClick={() => setActiveFile((prev) => Math.max(0, prev - 1))} disabled={activeFile === 0 || tab === "preview"} className="flex items-center gap-1 rounded-lg px-2 py-2 text-xs text-slate-300 hover:bg-white/5 disabled:opacity-30">
+                  <ChevronLeft size={16} /> Previous
+                </button>
+                <span className="text-xs text-slate-500">{activeFile + 1} / {artifacts[0].files.length}</span>
+                <button type="button" onClick={() => setActiveFile((prev) => Math.min(artifacts[0].files.length - 1, prev + 1))} disabled={activeFile === artifacts[0].files.length - 1 || tab === "preview"} className="flex items-center gap-1 rounded-lg px-2 py-2 text-xs text-slate-300 hover:bg-white/5 disabled:opacity-30">
+                  Next <ChevronRight size={16} />
+                </button>
+              </div>
+              {canPreview && (
+                <div className="grid grid-cols-2 gap-2">
+                  <button type="button" onClick={() => setTab("code")} className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm ${tab === "code" ? "border-orange-500/40 bg-orange-500/15 text-white" : "border-white/10 text-slate-400"}`}><Code2 size={16} /> Code</button>
+                  <button type="button" onClick={() => setTab("preview")} className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm ${tab === "preview" ? "border-orange-500/40 bg-orange-500/15 text-white" : "border-white/10 text-slate-400"}`}><EyeDashed size={16} /> Preview</button>
+                </div>
+              )}
+            </footer>
+          </div>
+        )}
+      </div>
 
        <motion.div
         initial={{width: 500}}
@@ -293,6 +364,7 @@ function Artifact() {
       </div>}
     </div>
     </motion.div>
+    </>
   );
 }
 
