@@ -1,56 +1,45 @@
 import PDFDocument from "pdfkit";
 
+const COLORS = {
+  ink: "#17191F",
+  orange: "#F97316",
+  red: "#DC2626",
+  text: "#303846",
+  muted: "#667085",
+  line: "#E2E5EA",
+  paper: "#FFFFFF",
+  pale: "#FFF7ED",
+  footer: "#8A93A1",
+};
+
 export const generatePdf = async (data) => {
   return new Promise((resolve, reject) => {
     try {
       const doc = new PDFDocument({
         size: "A4",
-        margins: {
-          top: 58,
-          bottom: 55,
-          left: 58,
-          right: 58,
-        },
+        margins: { top: 58, bottom: 58, left: 58, right: 58 },
         bufferPages: true,
+        autoFirstPage: true,
         info: {
           Title: data.title || "Akshar AI Document",
           Author: "Akshar AI",
           Creator: "Akshar AI",
+          Subject: data.subtitle || data.title || "Akshar AI Document",
         },
       });
 
       const chunks = [];
-
       doc.on("data", (chunk) => chunks.push(chunk));
       doc.on("end", () => resolve(Buffer.concat(chunks)));
       doc.on("error", reject);
 
-      const colors = {
-        navy: "#294B70",
-        blue: "#477DA8",
-        text: "#303945",
-        muted: "#778394",
-        line: "#D7DEE6",
-        bullet: "#477DA8",
-        footer: "#8993A0",
-      };
-
       const left = () => doc.page.margins.left;
-      const right = () =>
-        doc.page.width - doc.page.margins.right;
+      const right = () => doc.page.width - doc.page.margins.right;
       const width = () => right() - left();
-      const bottom = () =>
-        doc.page.height - doc.page.margins.bottom;
+      const contentBottom = () => doc.page.height - doc.page.margins.bottom;
 
-      const ensureSpace = (height) => {
-        if (doc.y + height > bottom()) {
-          doc.addPage();
-        }
-      };
-
-      const drawLine = (y, color = colors.line, thickness = 0.7) => {
-        doc
-          .save()
+      const line = (y, color = COLORS.line, thickness = 0.7) => {
+        doc.save()
           .moveTo(left(), y)
           .lineTo(right(), y)
           .lineWidth(thickness)
@@ -59,160 +48,145 @@ export const generatePdf = async (data) => {
           .restore();
       };
 
-      // ── DOCUMENT TITLE ───────────────────────────
+      const ensureSpace = (height, topGap = 0) => {
+        if (doc.y + topGap + height > contentBottom()) {
+          doc.addPage();
+        }
+      };
 
-      // No decorative line above the title.
-      doc
-        .font("Helvetica-Bold")
-        .fontSize(22)
-        .fillColor(colors.navy)
-        .text(data.title || "Untitled Document", {
+      const drawHeader = () => {
+        doc.save()
+          .rect(0, 0, doc.page.width, 6)
+          .fill(COLORS.orange)
+          .restore();
+      };
+
+      drawHeader();
+
+      // Cover/title block
+      doc.y = 84;
+      doc.font("Helvetica-Bold")
+        .fontSize(25)
+        .fillColor(COLORS.ink)
+        .text(data.title || "Untitled Document", left(), doc.y, {
           width: width(),
-          align: "center",
-          lineGap: 2,
+          align: "left",
+          lineGap: 3,
         });
 
-      // Subtitle directly below the title.
       if (data.subtitle) {
-        doc.y += 6;
-
-        doc
-          .font("Helvetica-Oblique")
-          .fontSize(10.5)
-          .fillColor(colors.muted)
-          .text(data.subtitle, {
+        doc.moveDown(0.65);
+        doc.font("Helvetica")
+          .fontSize(11)
+          .fillColor(COLORS.muted)
+          .text(data.subtitle, left(), doc.y, {
             width: width(),
-            align: "center",
-            lineGap: 2,
+            lineGap: 3,
           });
       }
 
-      // One subtle divider below the complete title block.
-      doc.y += 16;
-      drawLine(doc.y, colors.line, 0.8);
-      doc.y += 25;
+      doc.moveDown(1.1);
+      const accentY = doc.y;
+      doc.save()
+        .moveTo(left(), accentY)
+        .lineTo(left() + 56, accentY)
+        .lineWidth(3)
+        .strokeColor(COLORS.orange)
+        .stroke()
+        .restore();
+      doc.y = accentY + 26;
 
-      // ── SECTIONS ─────────────────────────────────
+      // Content sections
+      for (const [sectionIndex, section] of (data.sections || []).entries()) {
+        const heading = String(section.heading || `Section ${sectionIndex + 1}`);
+        doc.font("Helvetica-Bold").fontSize(15);
+        const headingHeight = doc.heightOfString(heading, { width: width(), lineGap: 2 });
 
-      for (const section of data.sections || []) {
-        const heading = section.heading || "Section";
+        const points = Array.isArray(section.points) ? section.points : [];
+        const firstPointHeight = points.length
+          ? doc.heightOfString(String(points[0]), {
+              width: width() - 19,
+              font: "Helvetica",
+              fontSize: 10.5,
+              lineGap: 3,
+            })
+          : 0;
 
-        doc
-          .font("Helvetica-Bold")
-          .fontSize(14);
+        // Keep the heading and at least the start of its first point together.
+        ensureSpace(headingHeight + 12 + Math.min(firstPointHeight, 42), 4);
 
-        const headingHeight = doc.heightOfString(heading, {
-          width: width(),
-          lineGap: 2,
-        });
+        doc.font("Helvetica-Bold")
+          .fontSize(15)
+          .fillColor(COLORS.ink)
+          .text(heading, left(), doc.y, { width: width(), lineGap: 2 });
 
-        // Avoid leaving a heading alone at the bottom of a page.
-        ensureSpace(headingHeight + 48);
+        doc.moveDown(0.25);
+        line(doc.y, COLORS.line, 0.65);
+        doc.y += 11;
 
-        doc
-          .font("Helvetica-Bold")
-          .fontSize(14)
-          .fillColor(colors.navy)
-          .text(heading, {
-            width: width(),
-            lineGap: 2,
-          });
-
-        // Section divider goes BELOW its heading.
-        doc.y += 4;
-        drawLine(doc.y, colors.line, 0.75);
-        doc.y += 10;
-
-        // ── BULLET POINTS ──────────────────────────
-
-        for (const point of section.points || []) {
-          const text = String(point);
-          const bulletIndent = 16;
-          const textX = left() + bulletIndent;
+        for (const rawPoint of points) {
+          const point = String(rawPoint);
+          const textX = left() + 17;
           const textWidth = right() - textX;
 
-          doc
-            .font("Helvetica")
-            .fontSize(10.5);
-
-          const pointHeight = doc.heightOfString(text, {
+          doc.font("Helvetica").fontSize(10.5);
+          const textHeight = doc.heightOfString(point, {
             width: textWidth,
             lineGap: 3,
           });
-
-          ensureSpace(pointHeight + 8);
+          ensureSpace(textHeight + 10);
 
           const startY = doc.y;
-
-          // Draw the bullet separately for consistent rendering.
-          doc
-            .save()
-            .circle(left() + 4, startY + 6, 2)
-            .fillColor(colors.bullet)
+          doc.save()
+            .circle(left() + 4, startY + 6, 2.1)
+            .fillColor(COLORS.orange)
             .fill()
             .restore();
 
-          doc
-            .font("Helvetica")
+          doc.font("Helvetica")
             .fontSize(10.5)
-            .fillColor(colors.text)
-            .text(text, textX, startY, {
+            .fillColor(COLORS.text)
+            .text(point, textX, startY, {
               width: textWidth,
               lineGap: 3,
+              paragraphGap: 2,
             });
 
-          // Comfortable but compact spacing between points.
-          doc.y += 5;
+          doc.y += 7;
         }
 
-        // Consistent separation between sections.
-        doc.y += 12;
+        doc.y += 10;
       }
 
-      // ── FOOTERS ──────────────────────────────────
+      // Add a restrained footer to every buffered page.
+      const pages = doc.bufferedPageRange();
+      for (let index = pages.start; index < pages.start + pages.count; index += 1) {
+        doc.switchToPage(index);
+        const page = doc.page;
+        const footerY = page.height - 39;
 
-     
-        const pages = doc.bufferedPageRange();
-      
-        for (
-          let i = pages.start;
-          i < pages.start + pages.count;
-          i++
-        ) {
-          doc.switchToPage(i);
-        
-          const originalBottomMargin = doc.page.margins.bottom;
-        
-          // Temporarily allow text inside the footer area.
-          doc.page.margins.bottom = 18;
-        
-          const footerY = doc.page.height - 34;
-          const halfWidth = width() / 2;
-        
-          // Footer divider.
-          drawLine(footerY - 9, colors.line, 0.5);
-        
-        
-          // Right footer.
-          doc
-            .font("Helvetica")
-            .fontSize(8)
-            .fillColor(colors.footer)
-            .text(
-              `Page ${i + 1} of ${pages.count}`,
-              left() + halfWidth,
-              footerY,
-              {
-                width: halfWidth,
-                align: "right",
-                lineBreak: false,
-              }
-            );
-        
-          // Restore the original margin.
-          doc.page.margins.bottom = originalBottomMargin;
-        }
+        doc.save()
+          .moveTo(page.margins.left, footerY - 8)
+          .lineTo(page.width - page.margins.right, footerY - 8)
+          .lineWidth(0.5)
+          .strokeColor(COLORS.line)
+          .stroke()
+          .restore();
 
+        doc.font("Helvetica")
+          .fontSize(8)
+          .fillColor(COLORS.footer)
+          .text("AKSHAR AI", page.margins.left, footerY, {
+            width: 160,
+            lineBreak: false,
+          });
+
+        doc.text(`Page ${index + 1} of ${pages.count}`, page.margins.left, footerY, {
+          width: page.width - page.margins.left - page.margins.right,
+          align: "right",
+          lineBreak: false,
+        });
+      }
 
       doc.end();
     } catch (error) {
