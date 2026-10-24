@@ -173,19 +173,28 @@ export const generatePdf = async (data) => {
           .stroke()
           .restore();
 
+        // Footer text must not trigger PDFKit's automatic page-break logic.
+        // Reset the cursor to the footer position and restore it afterwards;
+        // otherwise PDFKit can append blank pages while finalizing buffered pages.
+        doc.save();
+        doc.y = footerY;
         doc.font("Helvetica")
           .fontSize(8)
           .fillColor(COLORS.footer)
           .text("AKSHAR AI", page.margins.left, footerY, {
             width: 160,
+            height: 10,
             lineBreak: false,
           });
 
+        doc.y = footerY;
         doc.text(`Page ${index + 1} of ${pages.count}`, page.margins.left, footerY, {
           width: page.width - page.margins.left - page.margins.right,
+          height: 10,
           align: "right",
           lineBreak: false,
         });
+        doc.restore();
       }
 
       doc.end();
