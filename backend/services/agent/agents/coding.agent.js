@@ -214,9 +214,10 @@ ${stackInstructions}
 - Include complete implementations, not fragments or isolated stylesheets.
 - Do not invent dependencies or APIs.
 - Avoid unnecessary dependencies and features.
-- Make UI responsive, accessible, and polished when relevant.
-- Include working interactions when the request requires them.
-- Do not replace functional code with placeholders or pseudocode.
+- For websites, create a visually polished page with clear hierarchy, balanced spacing, attractive typography, consistent colors, and well-composed cards or sections suited to the request.
+- Make layouts genuinely responsive with flexible widths, CSS Grid/Flexbox, fluid sizing, and sensible mobile breakpoints; prevent horizontal overflow on narrow screens.
+- Keep the implementation focused on the user's request. Add interactions only when requested or essential; avoid unrelated, expensive features.
+- Do not replace requested content with placeholders or pseudocode.
 ${compact ? `
 - Keep the implementation compact.
 - Remove optional features and excessive decoration first.
@@ -224,13 +225,12 @@ ${compact ? `
 ` : ""}
 
 ## IMAGES
-- When images are requested, use valid direct image URLs.
-- Unsplash image URLs may use https://images.unsplash.com/photo-...
-- Use appropriate image subjects and meaningful alt text.
-- Never use source.unsplash.com or invent image URLs.
-- Do not use search-result pages as image sources.
-- Add sensible CSS fallbacks and image error handling where appropriate.
-- Do not claim an external image URL has been tested unless it has.
+- Use only direct image URLs for specific, known image assets; never fabricate or randomly assemble image URLs.
+- Prefer stable direct image URLs from reputable image CDNs. Never use source.unsplash.com or search-result pages as image sources.
+- Match each image to its subject and provide meaningful alt text.
+- Style images responsively with width: 100%, appropriate object-fit, and a defined aspect ratio or max-height.
+- Add an onerror fallback so a failed external image does not leave a broken-image icon; use a CSS background/color fallback or hide the failed image gracefully.
+- Never claim an external URL was verified unless it was actually tested.
 
 ## OUTPUT FORMAT
 Return exactly one valid JSON object:
@@ -316,10 +316,12 @@ ${fileNames.map((name) => `- ${name}`).join("\n")}
 
 Requirements:
 - This is one part of a coherent, runnable project. Match the other files and use the listed paths.
-- Implement a polished, responsive food-delivery website if that is the user's request, including useful working interactions rather than static mock controls.
+- Follow the user's explicit request and generate the relevant project, not an unrelated template.
+- For websites, keep the design polished and responsive across desktop, tablet, and mobile widths.
+- For images, use only specific direct image URLs and handle failed image loads gracefully.
 - Follow the user's explicit technology choice. For plain websites, use vanilla HTML, CSS, and JavaScript.
 - Do not repeat the user's request instead of code.
-- Do not omit core behavior or replace it with TODOs/placeholders.
+- Do not omit required behavior or replace requested content with TODOs/placeholders.
 - Keep code focused on this file; import/reference only the listed project files.
 - Return raw source code only. No JSON wrapper, Markdown fences, or explanations.
 `);
