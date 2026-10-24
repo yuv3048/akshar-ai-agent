@@ -128,7 +128,7 @@ function Artifact() {
         {!mobileOpen && (
           <aside className="fixed right-0 top-0 z-40 flex h-[100dvh] w-12 flex-col items-center gap-4 overflow-hidden border-l border-orange-600/70 bg-[#000000] py-4 shadow-xl shadow-black/30">
             <button type="button" onClick={() => setMobileOpen(true)} aria-label="Open artifact" title="Open artifact" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-300 transition hover:bg-white/10 hover:text-orange-400"><PanelRightOpen size={18} /></button>
-            <span className="min-h-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[20px] font-doto font-medium uppercase tracking-widest text-slate-500 [writing-mode:vertical-lr] rotate-180" title={artifacts[0]?.title}>{artifacts[0]?.title}</span>
+            <span className="min-h-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-center text-[20px] font-doto font-medium uppercase tracking-widest text-slate-500 [writing-mode:vertical-lr] rotate-180" title={artifacts[0]?.title}>{artifacts[0]?.title}</span>
             <button type="button" onClick={handleRemoveArtifact} aria-label="Remove artifact" title="Remove artifact" className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-red-500/10 hover:text-red-400"><X size={16} /></button>
           </aside>
         )}
