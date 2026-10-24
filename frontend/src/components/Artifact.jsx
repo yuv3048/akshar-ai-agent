@@ -126,10 +126,10 @@ function Artifact() {
       {/* Mobile artifact launcher: stays closed after generation to keep chat visible. */}
       <div className="lg:hidden">
         {!mobileOpen && (
-          <aside className="fixed right-0 top-1/2 z-40 flex max-h-[70dvh] w-11 -translate-y-1/2 flex-col items-center gap-3 overflow-hidden rounded-l-xl border border-r-0 border-orange-500/25 bg-[#080808] py-3 shadow-xl shadow-black/30">
+          <aside className="fixed right-0 top-0 z-40 flex h-[100dvh] w-12 flex-col items-center gap-4 overflow-hidden border-l border-orange-600/70 bg-[#000000] py-4 shadow-xl shadow-black/30">
             <button type="button" onClick={() => setMobileOpen(true)} aria-label="Open artifact" title="Open artifact" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-300 transition hover:bg-white/10 hover:text-orange-400"><PanelRightOpen size={18} /></button>
-            <span className="max-h-[40dvh] overflow-hidden text-ellipsis text-[11px] font-medium uppercase tracking-wider text-slate-400 [writing-mode:vertical-rl] rotate-180" title={artifacts[0]?.title}>{artifacts[0]?.title}</span>
-            <button type="button" onClick={handleRemoveArtifact} aria-label="Remove artifact" title="Remove artifact" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-red-500/10 hover:text-red-400"><X size={17} /></button>
+            <span className="min-h-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap text-[20px] font-doto font-medium uppercase tracking-widest text-slate-500 [writing-mode:vertical-lr] rotate-180" title={artifacts[0]?.title}>{artifacts[0]?.title}</span>
+            <button type="button" onClick={handleRemoveArtifact} aria-label="Remove artifact" title="Remove artifact" className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-red-500/10 hover:text-red-400"><X size={16} /></button>
           </aside>
         )}
 
@@ -265,45 +265,7 @@ function Artifact() {
           </div>
         }
 
-         {tab === "code" && artifacts[0].files.length > 1 && (
-        <div className="h-12 px-4 flex items-center justify-between
-           bg-[#050505] shrink-0">
-          
-          <button
-            onClick={() => setActiveFile((prev) => Math.max(0, prev - 1))}
-            disabled={activeFile === 0}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg
-              text-[12px] font-space text-slate-400
-              hover:text-white hover:bg-white/[0.05]
-              disabled:opacity-30 disabled:cursor-not-allowed
-              transition-colors cursor-pointer"
-          >
-            <ChevronLeft size={16} />
-            Previous
-          </button>
-      
-          <span className="text-[11px] text-slate-600 font-space">
-            {activeFile + 1} / {artifacts[0].files.length}
-          </span>
-      
-          <button
-            onClick={() =>
-              setActiveFile((prev) =>
-                Math.min(artifacts[0].files.length - 1, prev + 1)
-              )
-            }
-            disabled={activeFile === artifacts[0].files.length - 1}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg
-              text-[12px] font-space text-slate-400
-              hover:text-white hover:bg-white/[0.05]
-              disabled:opacity-30 disabled:cursor-not-allowed
-              transition-colors cursor-pointer"
-          >
-            Next
-            <ChevronRight size={16} />
-          </button>
-        </div>
-      )}
+
 
         <div className='flex-1 overflow-hidden '>
           {(tab == "preview" && canPreview)?
@@ -345,29 +307,31 @@ function Artifact() {
           </motion.div>
           }
         </div>
-     
+        {tab === "code" && artifacts[0].files.length > 1 && (
+          <footer className="h-12 px-4 flex items-center justify-between border-t border-white/[0.06] bg-[#050505] shrink-0">
+            <button onClick={() => setActiveFile((prev) => Math.max(0, prev - 1))} disabled={activeFile === 0} className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12px] font-space text-slate-400 hover:text-white hover:bg-white/[0.05] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer">
+              <ChevronLeft size={16} /> Previous
+            </button>
+            <span className="text-[11px] text-slate-600 font-space">{activeFile + 1} / {artifacts[0].files.length}</span>
+            <button onClick={() => setActiveFile((prev) => Math.min(artifacts[0].files.length - 1, prev + 1))} disabled={activeFile === artifacts[0].files.length - 1} className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12px] font-space text-slate-400 hover:text-white hover:bg-white/[0.05] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer">
+              Next <ChevronRight size={16} />
+            </button>
+          </footer>
+        )}
       </div>
         :
-      <div className='hidden lg:flex h-full border-l border-orange-600/70 bg-[#000000] flex-col items-center py-4 gap-3 shrink-0'>
-          <button className="flex items-center justify-center w-7 h-7 rounded-lg text-slate-500
-          hover:text-slate-200 hover:bg-white/[0.05] transition-colors duration-150 bg-transparent
-            border-none cursor-pointer shrink-0" onClick={()=>setCollapsed(false)}
-          >
+      <div className='hidden lg:flex h-full border-l border-orange-600/70 bg-[#000000] flex-col items-center py-4 gap-4 shrink-0'>
+          <button className="flex items-center justify-center w-7 h-7 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-white/[0.05] transition-colors duration-150 bg-transparent border-none cursor-pointer shrink-0" onClick={()=>setCollapsed(false)} aria-label="Expand artifact" title="Expand artifact">
             <PanelRightOpen size={18}/>
           </button>
-
-          <div className='flex items-center gap-2 flex-1 min-w-0'>
-              <button className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-500 hover:bg-red-500/10 hover:text-red-400" onClick={handleRemoveArtifact} aria-label="Remove artifact" title="Remove artifact"><X size={16}/></button>
-              <div 
-                className='text-[20px] font-doto font-medium text-slate-500 tracking-widest uppercase whitespace-nowrap'
-                style={{
-                  writingMode:"vertical-lr",
-                  transform:"rotate(180deg)"
-                }}
-                >
-                {artifacts[0]?.title}
-              </div>
+          <div className='flex flex-1 min-h-0 items-center justify-center overflow-hidden'>
+            <div className='text-[20px] font-doto font-medium text-slate-500 tracking-widest uppercase whitespace-nowrap' style={{ writingMode:"vertical-lr", transform:"rotate(180deg)" }} title={artifacts[0]?.title}>
+              {artifacts[0]?.title}
+            </div>
           </div>
+          <button className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-500 hover:bg-red-500/10 hover:text-red-400" onClick={handleRemoveArtifact} aria-label="Remove artifact" title="Remove artifact">
+            <X size={16}/>
+          </button>
       </div>}
     </div>
     </motion.div>
