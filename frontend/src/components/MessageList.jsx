@@ -114,12 +114,12 @@ function MessageList({ onSuggestionSelect, isGenerating = false }) {
             onMouseEnter={() => setIsHoveringSuggestions(true)}
             onMouseLeave={() => setIsHoveringSuggestions(false)}
           >
-            {visibleSuggestions.map(({ icon: Icon, label, prompt, detail, agent }) => (
+            {visibleSuggestions.map(({ icon: Icon, label, prompt, detail, agent }, index) => (
               <button
                 type="button"
                 key={label}
                 onClick={() => onSuggestionSelect?.({ prompt, agent })}
-                className="group min-w-0 flex-1 rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 text-left transition-all duration-300 hover:-translate-y-0.5 hover:border-orange-500/30 hover:bg-white/[0.045] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/60"
+                className={`group min-w-0 flex-1 rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4 text-left transition-all duration-300 hover:-translate-y-0.5 hover:border-orange-500/30 hover:bg-white/[0.045] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/60 ${index === 2 ? "hidden sm:block" : ""}`}
               >
                 <span className="mb-5 flex h-9 w-9 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] text-slate-300 transition-colors group-hover:border-orange-500/20 group-hover:bg-orange-500/10 group-hover:text-orange-300">
                   <Icon size={17} />
