@@ -25,11 +25,11 @@ const loadingMessages = [
 ];
 
 const suggestions = [
-  { icon: Code2, label: "Build something", prompt: "Help me build a polished responsive website with HTML, CSS, and JavaScript.", detail: "Turn an idea into a working project", agent: "coding" },
-  { icon: Globe2, label: "Explore a topic", prompt: "Explain how Redis works, with a practical example and when I should use it.", detail: "Learn with clear examples", agent: "search" },
-  { icon: FileText, label: "Create a document", prompt: "Create a downloadable PDF document: a well-structured beginner-friendly guide to system design, with clear sections, examples, and a concise summary.", detail: "Generate a PDF document", agent: "pdf" },
-  { icon: Presentation, label: "Create a presentation", prompt: "Create a PowerPoint presentation about system design for beginners, with a title slide, clear section slides, practical examples, and a conclusion.", detail: "Generate a PowerPoint presentation", agent: "ppt" },
-  { icon: ImageIcon, label: "Create an image", prompt: "Create a high-quality image of a futuristic city at sunset, with cinematic lighting, detailed architecture, and a polished composition.", detail: "Generate an image from a prompt", agent: "vision" },
+  { icon: Code2, label: "Build a website", prompt: "Build a responsive food delivery website using HTML, CSS, and JavaScript, with food images, restaurant cards, search, filters, and a functional cart.", detail: "Create a food delivery experience", agent: "coding" },
+  { icon: Globe2, label: "Explore fashion trends", prompt: "Research the latest 2026 fashion trends for men and women in India, covering outfits, colors, footwear, streetwear, ethnic fusion, and affordable styling tips. Include reliable sources.", detail: "Discover what is trending in India", agent: "search" },
+  { icon: FileText, label: "Create a PDF", prompt: "Create a well-structured PDF guide to India, covering its history, culture, states, cuisine, famous destinations, and travel tips.", detail: "Generate a guide to India", agent: "pdf" },
+  { icon: Presentation, label: "Create a presentation", prompt: "Create a polished PowerPoint about pet dogs, covering popular breeds, care, nutrition, training, and fun facts, with engaging visuals.", detail: "Make a presentation about pet dogs", agent: "ppt" },
+  { icon: ImageIcon, label: "Create an image", prompt: "Create a cinematic, photorealistic image of golden retriever puppies playing in a sunny park, with detailed fur, natural lighting, and professional composition.", detail: "Create a polished AI image", agent: "vision" },
 ];
 
 function getRandomSuggestions(previous = []) {
