@@ -1,4 +1,4 @@
-import { Code2, FileText, Globe2, ImageIcon, LoaderCircle, Presentation, Sparkles } from "lucide-react";
+import { Code2, FileText, Globe2, ImageIcon, Presentation, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import MessageBubble from "./MessageBubble";
@@ -148,12 +148,8 @@ function MessageList({ onSuggestionSelect, isGenerating = false }) {
             <div
               role="status"
               aria-live="polite"
-              className="my-3 flex items-center gap-3 rounded-2xl border border-orange-500/15 bg-white/[0.025] px-4 py-3 text-sm text-slate-300"
+              className="my-3 flex items-center gap-3 px-1 py-2 text-sm text-white"
             >
-              <span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-orange-500/20 bg-orange-500/10 text-orange-300">
-                <LoaderCircle size={17} className="animate-spin" />
-                <span className="absolute inset-0 rounded-xl bg-orange-500/10 blur-md" />
-              </span>
               <span key={loadingMessage} className="animate-pulse transition-opacity duration-300">
                 {loadingMessage}
               </span>
