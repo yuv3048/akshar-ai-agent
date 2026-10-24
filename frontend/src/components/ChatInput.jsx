@@ -167,7 +167,7 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
           <button
             type="button"
             disabled={!value.trim() || sending}
-            onClick={handleSendMessage}
+            onClick={() => handleSendMessage()}
             className={`flex items-center justify-center w-10 h-10 rounded-xl border-none transition-all duration-150 ${
               value.trim() && !sending
                 ? "bg-linear-to-br from-orange-500 to-red-600 hover:brightness-110 text-white shadow-[0_4px_18px_rgba(234,70,35,0.18)] cursor-pointer"
