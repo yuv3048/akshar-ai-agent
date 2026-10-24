@@ -25,7 +25,7 @@ const loadingMessages = [
 ];
 
 const suggestions = [
-  { icon: Code2, label: "Build a website", prompt: "Build a responsive food delivery website using HTML, CSS, and JavaScript, with food images, restaurant cards, search, filters, and a functional cart.", detail: "Create a food delivery experience", agent: "coding" },
+  { icon: Code2, label: "Build a website", prompt: "Create a beautiful food delivery website homepage using HTML, CSS, and JavaScript, with an attractive layout, high-quality food images, and stylish restaurant cards.", detail: "Create a food delivery experience", agent: "coding" },
   { icon: Globe2, label: "Explore fashion trends", prompt: "Research the latest 2026 fashion trends for men and women in India, covering outfits, colors, footwear, streetwear, ethnic fusion, and affordable styling tips. Include reliable sources.", detail: "Discover what is trending in India", agent: "search" },
   { icon: FileText, label: "Create a PDF", prompt: "Create a well-structured PDF guide to India, covering its history, culture, states, cuisine, famous destinations, and travel tips.", detail: "Generate a guide to India", agent: "pdf" },
   { icon: Presentation, label: "Create a presentation", prompt: "Create a polished PowerPoint about pet dogs, covering popular breeds, care, nutrition, training, and fun facts, with engaging visuals.", detail: "Make a presentation about pet dogs", agent: "ppt" },
