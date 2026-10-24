@@ -22,6 +22,14 @@ export const previewAsset = async (req, res) => {
     }
     const previewUrl = await getFromS3(filename, 600, "inline");
     res.setHeader("Cache-Control", "private, no-store");
+
+    // Browsers generally cannot render PPTX files directly. Let Office Online
+    // fetch the short-lived, signed S3 URL for an in-browser presentation preview.
+    if (filename.toLowerCase().endsWith(".pptx")) {
+      const officePreviewUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(previewUrl)}`;
+      return res.redirect(302, officePreviewUrl);
+    }
+
     return res.redirect(302, previewUrl);
   } catch (error) {
     console.error("Asset preview error:", error);
