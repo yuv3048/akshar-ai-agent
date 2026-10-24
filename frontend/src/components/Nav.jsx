@@ -22,7 +22,7 @@ function Nav({ onOpenSidebar }) {
         src="/akshar-logo.svg"
         alt="Akshar AI logo"
         rel="icon"
-        className="h-9 w-20 shrink-0 object-contain object-center "
+        className="h-10 w-10 shrink-0 scale-125 object-contain object-center"
       />
 
       <span className="font-space font-semibold text-sm tracking-wide text-slate-100 min-w-0 flex-1 truncate">
