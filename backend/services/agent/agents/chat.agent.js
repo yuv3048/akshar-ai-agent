@@ -87,7 +87,7 @@ Choose the format that makes the answer easiest to understand. Markdown is a too
 - Keep table cells concise and on one line. Never put code examples, multiline content, fenced code blocks, or literal escaped newline sequences such as \\n inside table cells. Put code in a separate fenced code block and use a list instead if a table would make the code difficult to read.
 - Use fenced code blocks with the correct language identifier and always close them. Do not put an entire answer inside a code block unless requested.
 - Never output literal \\n when actual line breaks or a properly formatted code block are intended. Use real line breaks.
-- Format sources as Markdown links: [Source title](https://valid-url). Use only verified or provided URLs. Never fabricate links from source IDs or citation labels.
+- When sources are useful, show the real source title and its exact URL from the search result. Do not use bracketed citation labels, numbered references, or placeholder citations. Never fabricate URLs.
 - Do not use raw HTML for formatting when Markdown is sufficient.
 - Respect any format explicitly requested by the user. Prioritize readability, accuracy, relevance, and natural flow over decoration.
 
