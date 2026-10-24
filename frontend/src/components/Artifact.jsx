@@ -1,6 +1,7 @@
-import { Check, ChevronLeft, ChevronRight, Code2, Copy, EyeDashed, PanelRightClose, PanelRightOpen } from 'lucide-react'
+import { Check, ChevronLeft, ChevronRight, Code2, Copy, EyeDashed, PanelRightClose, PanelRightOpen, X } from 'lucide-react'
 import { useEffect, useState } from 'react';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { clearArtifacts } from "../redux/messageSlice";
 import { easeInOut, motion } from "motion/react"
 import Editor from '@monaco-editor/react';
 
@@ -10,6 +11,12 @@ function Artifact() {
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const {artifacts} = useSelector(state=>state.message)
+  const dispatch = useDispatch()
+
+  const handleRemoveArtifact = () => {
+    setMobileOpen(false)
+    dispatch(clearArtifacts())
+  }
 
   const [tab, setTab] = useState("code")
 
@@ -118,26 +125,24 @@ function Artifact() {
     <>
       {/* Mobile artifact launcher: stays closed after generation to keep chat visible. */}
       <div className="lg:hidden">
-        <button
-          type="button"
-          onClick={() => setMobileOpen(true)}
-          aria-label="Open artifact"
-          className="fixed bottom-5 right-4 z-40 flex h-12 w-12 items-center justify-center rounded-full border border-orange-500/30 bg-[#111111] text-orange-400 shadow-lg shadow-black/40 transition hover:bg-[#1b1b1b]"
-        >
-          <Code2 size={21} />
-        </button>
+        {!mobileOpen && (
+          <aside className="fixed right-0 top-1/2 z-40 flex max-h-[70dvh] w-11 -translate-y-1/2 flex-col items-center gap-3 overflow-hidden rounded-l-xl border border-r-0 border-orange-500/25 bg-[#080808] py-3 shadow-xl shadow-black/30">
+            <button type="button" onClick={() => setMobileOpen(true)} aria-label="Open artifact" title="Open artifact" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-300 transition hover:bg-white/10 hover:text-orange-400"><PanelRightOpen size={18} /></button>
+            <span className="max-h-[40dvh] overflow-hidden text-ellipsis text-[11px] font-medium uppercase tracking-wider text-slate-400 [writing-mode:vertical-rl] rotate-180" title={artifacts[0]?.title}>{artifacts[0]?.title}</span>
+            <button type="button" onClick={handleRemoveArtifact} aria-label="Remove artifact" title="Remove artifact" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-red-500/10 hover:text-red-400"><X size={17} /></button>
+          </aside>
+        )}
 
         {mobileOpen && (
           <div className="fixed inset-0 z-50 flex h-[100dvh] w-full flex-col overflow-hidden bg-[#000000] text-white">
             <header className="flex min-h-14 items-center gap-2 border-b border-white/10 px-3">
-              <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close artifact" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-300 hover:bg-white/10">
-                <PanelRightClose size={19} />
-              </button>
+              <button type="button" onClick={() => setMobileOpen(false)} aria-label="Collapse artifact" title="Collapse artifact" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-300 hover:bg-white/10"><PanelRightClose size={19} /></button>
               <Code2 size={17} className="shrink-0 text-orange-400" />
               <h2 className="min-w-0 flex-1 truncate text-sm font-medium">{artifacts[0]?.title}</h2>
               <button type="button" onClick={handleCopy} aria-label="Copy current file" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-300 hover:bg-white/10">
                 {copied ? <Check size={17} /> : <Copy size={17} />}
               </button>
+              <button type="button" onClick={handleRemoveArtifact} aria-label="Remove artifact" title="Remove artifact" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-400 hover:bg-red-500/10 hover:text-red-400"><X size={18} /></button>
             </header>
 
             {tab === "code" && (
@@ -213,6 +218,7 @@ function Artifact() {
                     >
                     {copied?<Check size={16}/>:<Copy size={16}/>}
                   </button>
+                  <button className='flex items-center justify-center w-8 h-8 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-colors duration-150 bg-transparent border-none cursor-pointer' onClick={handleRemoveArtifact} aria-label="Remove artifact" title="Remove artifact"><X size={17}/></button>
               </div>
 
             {canPreview && 
@@ -351,6 +357,7 @@ function Artifact() {
           </button>
 
           <div className='flex items-center gap-2 flex-1 min-w-0'>
+              <button className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-500 hover:bg-red-500/10 hover:text-red-400" onClick={handleRemoveArtifact} aria-label="Remove artifact" title="Remove artifact"><X size={16}/></button>
               <div 
                 className='text-[20px] font-doto font-medium text-slate-500 tracking-widest uppercase whitespace-nowrap'
                 style={{
