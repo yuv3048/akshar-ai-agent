@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux"
 import { PanelLeft } from "lucide-react"
+import AksharLogo from "./AksharLogo.jsx"
 
 function Nav({ onOpenSidebar }) {
   const { selectedConversation } = useSelector(state => state.conversation)
