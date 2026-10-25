@@ -163,15 +163,13 @@ function ChatInput() {
               })}
           </div>
 
-          <textarea 
-          placeholder='Ask anything...' 
-          onChange={(e)=>setValue(e.target.value)}
-          value={value}
-          className='w-full bg-transparent outline-none resize-none text-[14px]
-           text-slate-200 placeholder:text-slate-600 leading-relaxed [scrollbar-width:none]
-          [&::-webkit-scrollbar]:hidden disabled:opacity-50' 
-          rows={2}
-          className='w-full max-h-[18dvh] min-h-[44px] overflow-y-auto bg-transparent outline-none resize-none text-[14px] text-slate-200 placeholder:text-slate-600 leading-relaxed [scrollbar-width:none] [&::-webkit-scrollbar]:hidden disabled:opacity-50' />
+          <textarea
+            placeholder='Ask anything...'
+            onChange={(e)=>setValue(e.target.value)}
+            value={value}
+            rows={2}
+            className='w-full max-h-[18dvh] min-h-[44px] overflow-y-auto bg-transparent outline-none resize-none text-[14px] text-slate-200 placeholder:text-slate-600 leading-relaxed [scrollbar-width:none] [&::-webkit-scrollbar]:hidden disabled:opacity-50'
+          />
           <div className='flex items-center justify-between'>
             <div className='flex items-centr gap-1'>
               <button className='flex items-center justify-center w-8 h-8 rounded-lg text-slate-300
