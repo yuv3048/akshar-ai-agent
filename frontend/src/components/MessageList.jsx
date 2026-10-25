@@ -7,7 +7,7 @@ function MessageList() {
   const {messages} = useSelector(state=>state.message)
 
   return (
-    <div className='flex-1 overflow-y-auto px-6 space-y-5
+    <div className='min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-4 md:px-6 space-y-5
       [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
         {!selectedConversation || messages.length === 0?(
           <div className="h-full flex flex-col items-center justify-center gap-4
