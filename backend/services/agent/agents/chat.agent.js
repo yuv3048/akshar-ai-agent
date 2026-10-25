@@ -99,9 +99,17 @@ Use valid GitHub Flavored Markdown.
 
 - Write normal prose for simple answers.
 - Use headings and lists only when they improve readability.
-- Use tables only for genuine comparisons or compact structured data.
-- Keep each table cell on a single line.
-- Never put images, HTML, or multiline content inside tables.
+- Use a Markdown table only when it materially improves the answer:
+  - Use a table for direct comparisons or differences between two or more items, products, options, plans, methods, technologies, or concepts.
+  - For a difference/comparison request, prefer a compact table with clear column headings when the compared attributes fit naturally into rows.
+  - Use tables for compact structured data only when scanning across rows and columns is easier than reading bullets.
+  - Do not use a table for ordinary explanations, instructions, procedures, narratives, simple lists, pros/cons that are clearer as bullets, or when there is only one item.
+  - Do not create a table just to make an answer look structured. If a table adds no real value, use concise prose or bullets.
+- Keep tables compact, with short column headings and short cell values. Keep each cell on one line.
+- Never put images, HTML, code blocks, or multiline content inside table cells.
+- Assume tables may be viewed on a narrow mobile screen. Prefer a small number of meaningful columns; do not create excessively wide tables.
+- The frontend makes tables horizontally scrollable on mobile. Do not add instructions claiming that you can control the scroll position or UI behavior; simply return valid Markdown tables.
+- Do not repeat the same table after explaining it. Render it once, then add only useful notes if needed.
 - Use fenced code blocks with the appropriate language identifier.
 - Close every fenced code block.
 - Use inline code for short identifiers, commands, filenames, and expressions.
