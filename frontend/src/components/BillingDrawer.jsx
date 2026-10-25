@@ -93,7 +93,7 @@ function BillingDrawer({ open, onClose }) {
                 type="button"
                 aria-label="Close billing"
                 onClick={onClose}
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-slate-400 transition hover:border-orange-500/30 hover:bg-orange-500/10 hover:text-white"
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-slate-400 transition hover:border-red-500/30 hover:bg-red-500/10 hover:text-white cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -105,7 +105,7 @@ function BillingDrawer({ open, onClose }) {
                 <div className="relative flex items-start justify-between gap-4">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Your current plan</p>
-                    <h3 className="mt-2 font-space text-2xl font-bold capitalize text-white">{userData?.plan || "Free"}</h3>
+                    <h3 className="mt-2 font-space text-orange-600 text-2xl font-bold capitalize ">{userData?.plan || "Free"}</h3>
                     <p className="mt-1 text-sm text-slate-400">Keep creating with Akshar AI</p>
                   </div>
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-orange-400/20 bg-orange-500/10 text-orange-400">
@@ -122,11 +122,6 @@ function BillingDrawer({ open, onClose }) {
                   </div>
                 </div>
               </section>
-
-              <div className="flex items-center gap-2 px-0.5">
-                <Sparkles size={15} className="text-orange-400" />
-                <p className="text-sm font-medium text-slate-300">Choose the plan that fits your flow</p>
-              </div>
 
               <div className="space-y-3">
                 {plans.map((plan) => {
@@ -145,7 +140,7 @@ function BillingDrawer({ open, onClose }) {
                       )}
                       <div className="flex items-start gap-3">
                         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${plan.popular ? "border-orange-400/20 bg-orange-500/10 text-orange-300" : "border-white/10 bg-white/[0.04] text-slate-300"}`}>
-                          <PlanIcon size={19} />
+                          <PlanIcon size={19} className='text-yellow-500'/>
                         </div>
                         <div className="min-w-0 flex-1">
                           <h3 className="font-space font-semibold text-white">{plan.name} plan</h3>
