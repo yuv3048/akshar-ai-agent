@@ -119,11 +119,7 @@ function SideBar({ mobileOpen = false, onClose = () => {} }) {
       <aside className={`fixed inset-y-0 left-0 z-50 h-dvh min-h-0 w-[270px] max-w-[85vw] shrink-0 overflow-hidden border-r border-white/[0.06] bg-[#050505] transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} ${collapsed ? "lg:hidden" : "lg:static lg:translate-x-0"}`}>
       <div className="flex h-full min-h-0 flex-col overflow-hidden">
         <div className="flex items-center gap-2.5 px-4 py-5 border-b border-white/[0.06]">
-           <img
-              src="./akshar-logo.svg"
-              alt="Akshar AI"
-              className="w-8 h-8 scale-160"
-            />
+           <AksharLogo className="h-8 w-8 shrink-0" />
             <span className='font-space font-bold text-[16px] text-slate-500'>/</span>
             <span className="font-doto text-[20px] font-bold text-slate-300 flex-1">
                Akshar AI
