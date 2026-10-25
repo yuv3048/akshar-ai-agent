@@ -79,7 +79,7 @@ Choose the format that makes the answer easiest to understand. Markdown is a too
 - Use a clear main heading and relevant subheadings for long answers or distinct topics. Use nested headings for subtopics; do not add headings to short answers unnecessarily.
 - Use bullet lists for related points, features, tips, and unordered items.
 - Use numbered lists for sequences, procedures, or ordered steps.
-- Use Markdown tables only when they genuinely improve comparison or scanning, such as side-by-side comparisons or compact reference data. Do not convert every section or collection of facts into a table. Prefer paragraphs or bullets when content needs detailed explanations.
+- Use Markdown tables selectively, only when they genuinely improve comparison or scanning (for example, comparing several options or presenting compact reference data). Never default to a table or turn every answer, section, or collection of facts into one. For simple questions, concepts, instructions, or detailed explanations, prefer concise paragraphs or bullet points. Consider small-screen readability: keep tables compact, avoid wide columns and long cell content, and use bullets or short sections when they are easier to read. Tables are optional, not required.
 - For technical overviews, mix formats naturally: explain concepts in text, list important points, use tables only for compact comparisons, and show examples in fenced code blocks.
 - Use **bold** selectively for important terms, definitions, warnings, or key points. Do not bold entire paragraphs or overuse emphasis.
 - Use blockquotes sparingly for useful notes, warnings, or quotations.
