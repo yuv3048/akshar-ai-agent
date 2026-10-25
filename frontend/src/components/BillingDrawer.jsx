@@ -75,7 +75,7 @@ function BillingDrawer({ open, onClose }) {
             animate={{ opacity: 0.6 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 z-40 bg-black backdrop-blur-sm"
+            className="fixed inset-0 z-40 cursor-pointer bg-black backdrop-blur-sm"
           />
           <motion.aside
             initial={{ x: "100%" }}
@@ -99,7 +99,7 @@ function BillingDrawer({ open, onClose }) {
               </button>
             </header>
 
-            <div className="space-y-5 overflow-y-auto p-5">
+            <div className="space-y-5 overflow-y-auto p-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <section className="relative overflow-hidden rounded-2xl border border-orange-500/20 bg-gradient-to-br from-orange-500/[0.12] via-[#111111] to-red-950/20 p-5">
                 <div className="pointer-events-none absolute -right-10 -top-12 h-36 w-36 rounded-full bg-orange-500/10 blur-3xl" />
                 <div className="relative flex items-start justify-between gap-4">
@@ -123,7 +123,7 @@ function BillingDrawer({ open, onClose }) {
                 </div>
               </section>
 
-              <div className="space-y-3">
+              <div className="space-y-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {plans.map((plan) => {
                   const PlanIcon = plan.icon;
                   const isCurrentPlan = userData?.plan === plan.id;
@@ -169,11 +169,10 @@ function BillingDrawer({ open, onClose }) {
                         </span>
                         <button
                           type="button"
-                          disabled={isCurrentPlan}
                           onClick={() => handleUpgrade(plan.id)}
-                          className={`rounded-xl px-4 py-2.5 font-doto text-sm font-extrabold transition-all disabled:cursor-default disabled:border disabled:border-white/10 disabled:bg-white/[0.04] disabled:text-slate-500 ${plan.popular ? "bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-md shadow-orange-950/30 hover:from-red-500 hover:to-orange-500 hover:shadow-orange-900/30" : "border border-white/10 bg-white/[0.05] text-slate-200 hover:border-orange-500/30 hover:bg-orange-500/10"}`}
+                          className={`cursor-pointer rounded-xl px-4 py-2.5 font-doto text-sm font-extrabold transition-all active:scale-[0.98] ${plan.popular ? "bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-md shadow-orange-950/30 hover:from-red-500 hover:to-orange-500 hover:shadow-orange-900/30" : "border border-white/10 bg-white/[0.05] text-slate-200 hover:border-orange-500/30 hover:bg-orange-500/10"}`}
                         >
-                          {isCurrentPlan ? "Current plan" : "Upgrade"}
+                          {isCurrentPlan ? "Buy again" : "Upgrade"}
                         </button>
                       </div>
                     </section>
