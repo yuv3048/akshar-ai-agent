@@ -109,7 +109,15 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
   return (
     <div className="w-full shrink-0 bg-[#000000] px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 sm:px-5 sm:pb-4">
       <div className="mx-auto w-full max-w-4xl">
-      <div className="group flex flex-col gap-2 rounded-2xl sm:gap-3 border border-white/[0.10] bg-[#0D0F14] px-3 pt-3 pb-3 shadow-[0_12px_45px_rgba(0,0,0,0.28)] transition-colors focus-within:border-orange-500/35 sm:px-4">
+      <div
+        style={{
+          backgroundImage: "linear-gradient(#0D0F14, #0D0F14), linear-gradient(120deg, rgba(249,115,22,0.9), rgba(220,38,38,0.9))",
+          backgroundOrigin: "border-box",
+          backgroundClip: "padding-box, border-box",
+          borderColor: "transparent",
+        }}
+        className="group flex flex-col gap-2 rounded-2xl sm:gap-3 border px-3 pt-3 pb-3 shadow-[0_12px_45px_rgba(0,0,0,0.28)] transition-colors sm:px-4"
+      >
 
 
         <div className="flex w-full gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -122,9 +130,10 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
                 key={agent.id}
                 disabled={sending}
                 onClick={() => setSelectedAgent(agent.label)}
+                style={isActive ? { backgroundImage: "linear-gradient(115deg, #c2410c 0%, #dc2626 100%)" } : undefined}
                 className={`shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl font-inter text-xs font-medium cursor-pointer border transition-all disabled:opacity-50 ${
                   isActive
-                    ? "bg-linear-to-r from-orange-700 to-red-600 text-white border-transparent shadow-[0_1px_8px_rgba(234,70,35,0.35)] hover:shadow-[0_2px_14px_rgba(234,70,35,0.5)]"
+                    ? "text-white border-transparent shadow-[0_1px_8px_rgba(234,70,35,0.35)] hover:shadow-[0_2px_14px_rgba(234,70,35,0.5)]"
                     : "bg-white/[0.03] text-slate-400 border-white/[0.06] hover:bg-white/[0.07]"
                 }`}
               >
@@ -168,9 +177,10 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
             type="button"
             disabled={!value.trim() || sending}
             onClick={() => handleSendMessage()}
+            style={value.trim() && !sending ? { backgroundImage: "linear-gradient(135deg, #f97316 0%, #dc2626 100%)" } : undefined}
             className={`flex items-center justify-center w-10 h-10 rounded-xl border-none transition-all duration-150 ${
               value.trim() && !sending
-                ? "bg-linear-to-br from-orange-500 to-red-600 hover:brightness-110 text-white shadow-[0_4px_18px_rgba(234,70,35,0.18)] cursor-pointer"
+                ? "hover:brightness-110 text-white shadow-[0_4px_18px_rgba(234,70,35,0.18)] cursor-pointer"
                 : "bg-white/[0.05] text-slate-600 cursor-not-allowed"
             }`}
           >
