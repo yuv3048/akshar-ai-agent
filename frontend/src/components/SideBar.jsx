@@ -227,7 +227,7 @@ function SideBar({ mobileOpen = false, onClose = () => {} }) {
                         ? "bg-orange-500/10 border-red-500/[0.18] rounded-r-lg border-l-2 border-l-orange-600"
                         : "bg-transparent border-transparent"
                     }`}
-                onClick={() => dispatch(setSelectedConversation(conv))}
+                onClick={() => { dispatch(setSelectedConversation(conv)); onClose(); }}
               >
                 <div
                   className={`flex items-center justify-center shrink-0 w-[28px] h-[28px]
