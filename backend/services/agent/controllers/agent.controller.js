@@ -10,7 +10,7 @@ const CHAT_RATE_WINDOW_SECONDS = 60;
 const generateConversationTitle = async (prompt) => {
   const llm = await getModel("chat");
   const response = await llm.invoke([
-    ["system", "Create a concise conversation title based only on the user's first message. Return only the title, 3 to 6 words, no quotes, no markdown, maximum 60 characters."],
+    ["system", "Create a concise, meaningful conversation title based only on the user's first message. Return only 2 to 4 words, no quotes, no markdown, maximum 40 characters."],
     ["human", prompt.slice(0, 4000)],
   ]);
   const title = (typeof response.content === "string" ? response.content : "")
