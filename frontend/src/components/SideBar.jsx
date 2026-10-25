@@ -22,6 +22,7 @@ import logOut from "../features/logOut.js";
 import { setUserdata } from "../redux/userSlice.js";
 import { setArtifacts, setMessages } from "../redux/messageSlice";
 import BillingDrawer from "./BillingDrawer.jsx";
+import AksharLogo from "./AksharLogo.jsx";
 
 function SideBar({ mobileOpen = false, onClose = () => {} }) {
   const [collapsed, setCollapsed] = useState(false);
