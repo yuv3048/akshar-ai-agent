@@ -21,11 +21,7 @@ function Nav({ onOpenSidebar }) {
 
 
       <span className="flex items-center font-space font-bold text-sm tracking-wide text-slate-400 min-w-0 flex-1 truncate">
-        <img
-              src="/akshar-logo.svg"
-              alt="Akshar AI"
-              className="w-8 h-8 scale-150"
-        />
+        <AksharLogo className="h-8 w-8 shrink-0" />
          : {selectedConversation?.title || "Akshar AI"}
       </span>
 
