@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import GoogleIcon from '@mui/icons-material/Google';
+import { useState } from 'react';
 
 import { signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '../../utils/firebase';
@@ -13,9 +13,9 @@ import Artifact from '../components/Artifact';
 
 function Home() {
 
-    const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
     const {userData} = useSelector(state=>state.user)
     const dispatch = useDispatch()
+    const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
 
     const handleLogin = async (token) =>{
         try{
