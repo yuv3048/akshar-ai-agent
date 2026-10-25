@@ -32,13 +32,14 @@ function MessageBubble({role, content, images}) {
 
   return (
     <div className={`flex ${isUser? "justify-end" : "justify-start"}`}>
-      <div className={`max-w-[92vw] md:max-w-[72%] px-4 py-2.5 rounded-2xl font-inter break-words overflow-hidden leading-relaxed
-        ${isUser?
-          'my-2 font-inter bg-linear-to-r from-red-600 to-orange-700 text-white rounded-tr-sm'
-          : 
-          'my-2 font-inter bg-[#000000] border border-white/[0.08] text-slate-200 rounded-tl-sm'
-        }
-        `}>
+      <div
+        style={isUser ? { backgroundImage: "linear-gradient(115deg, #dc2626 0%, #c2410c 100%)" } : undefined}
+        className={`max-w-[92vw] md:max-w-[72%] px-4 py-2.5 rounded-2xl font-inter break-words overflow-hidden leading-relaxed
+          ${isUser
+            ? "my-2 font-inter text-white rounded-tr-sm"
+            : "my-2 font-inter bg-[#000000] border border-white/[0.08] text-slate-200 rounded-tl-sm"
+          }`}
+      >
 
          {images?.length>0 && (
             <div className='flex flex-wrap gap-3 mt-4'>
