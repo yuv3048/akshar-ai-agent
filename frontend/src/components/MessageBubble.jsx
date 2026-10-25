@@ -189,12 +189,12 @@ function MessageBubble({role, content, images, assetPreviewUrl, assetDownloadUrl
                 alt={alt || "AI response image"}
                 loading="lazy"
                 onError={(e) => {
-                  e.currentTarget.style.display = "none";
+                  console.error("Markdown image failed to load:", src);
                 }}
                 onClick={() => setLightBox(src)}
-                className="my-4 max-w-full max-h-[420px] rounded-xl
-                  border border-white/10 object-contain cursor-zoom-in
-                  hover:border-orange-500/40 transition-colors"
+                className="my-3 block max-w-full max-h-[280px] sm:max-h-[420px]
+                  rounded-xl border border-white/10 object-contain
+                  cursor-zoom-in hover:border-orange-500/40 transition-colors"
               />
             ),
             code:({className, children})=>{
