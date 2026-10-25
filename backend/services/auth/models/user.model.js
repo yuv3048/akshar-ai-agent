@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
         default:"free"
     },
     credits: {
-        type: String,
+        type: Number,
         default: 100
     },
     totalCredits: {
