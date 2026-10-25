@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import GoogleIcon from '@mui/icons-material/Google';
 
 import { signInWithPopup } from 'firebase/auth';
@@ -12,6 +13,7 @@ import Artifact from '../components/Artifact';
 
 function Home() {
 
+    const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
     const {userData} = useSelector(state=>state.user)
     const dispatch = useDispatch()
 
@@ -37,10 +39,10 @@ function Home() {
       }
 
   return (
-    <div className='h-screen flex bg-[#000000]  text-white overflow-hidden'>
+    <div className='flex h-dvh min-h-0 w-full overflow-hidden bg-[#000000] text-white'>
    
-      <SideBar/>
-      <ChatArea/>
+      <SideBar mobileOpen={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
+      <ChatArea onOpenSidebar={() => setMobileSidebarOpen(true)} />
       <Artifact/>
 
       {!userData &&  <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm'>

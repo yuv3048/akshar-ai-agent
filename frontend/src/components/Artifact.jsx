@@ -110,6 +110,7 @@ function Artifact() {
   return (
 
        <motion.div
+        className="hidden h-full min-h-0 shrink-0 lg:block"
         initial={{width: 500}}
         animate={{width:collapsed?48:500}}
         transition={{
@@ -117,7 +118,7 @@ function Artifact() {
           ease:easeInOut
         }}
       >
-    <div className="hidden lg:flex h-full border-1 border-white/[0.06] flex-col overflow-hidden shrink-0">
+    <div className="flex h-full min-h-0 w-full border-1 border-white/[0.06] flex-col overflow-hidden shrink-0">
       {!collapsed?<div className="flex flex-col h-full bg-[#000000]">
         <div className="h-14 px-4 border-b border-white/[0.06] flex items-center gap-3 shrink-0">
           <button className="flex items-center justify-center w-7 h-7 rounded-1g text-slate-500
