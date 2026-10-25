@@ -39,7 +39,7 @@ function Home() {
       }
 
   return (
-    <div className='h-screen flex bg-[#000000]  text-white overflow-hidden'>
+    <div className='h-[100dvh] flex bg-[#000000] text-white overflow-hidden'>
    
       <SideBar mobileOpen={mobileSidebarOpen} onMobileClose={() => setMobileSidebarOpen(false)} />
       <ChatArea onOpenSidebar={() => setMobileSidebarOpen(true)} />
