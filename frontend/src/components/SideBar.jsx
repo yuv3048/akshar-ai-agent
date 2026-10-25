@@ -149,9 +149,9 @@ function SideBar({ mobileOpen = false, onClose = () => {} }) {
 
         <div className="shrink-0 px-4 pt-4 pb-1">
           <button
+            style={{ backgroundImage: "linear-gradient(115deg, #dc2626 0%, #c2410c 100%)" }}
             className="w-full flex items-center justify-center gap-2 text-sm font-medium text-white font-Inter
-                bg-linear-to-br from-red-600 to-orange-700 rounded-4xl hover:from-orange-700 hover:to-red-600  
-                                border border-red-950 py-[10px] cursor-pointer hover:shadow-[0_1px_8px_rgba(234,70,35,0.35)] 
+                rounded-4xl border border-red-950 py-[10px] cursor-pointer hover:shadow-[0_1px_8px_rgba(234,70,35,0.35)] 
                 transition-opacity duration-150"
             onClick={async () => { await handleNewChat(); onClose?.(); }}
             disabled={creatingConversation}
