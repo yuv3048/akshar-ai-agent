@@ -20,7 +20,7 @@ import { createConversation } from "../features/createConversation";
 import logOut from "../features/logOut.js";
 import { setUserdata } from "../redux/userSlice.js";
 
-function SideBar() {
+function SideBar({ mobileOpen = false, onClose = () => {} }) {
   const [collapsed, setCollapsed] = useState(false);
   const [imageError, setImageError] = useState(false);
 
@@ -105,7 +105,7 @@ function SideBar() {
         <div className="mx-2.5 h-px bg-white/[0.06]" />
 
         <div
-          className="flex-1 overflow-y-auto px-2.5 pb-2 [scrollbar-width:none]
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2.5 pb-2 [scrollbar-width:none]
           [&::-webkit-scrollbar]:hidden pt-5"
         >
           {conversations.map((conv, i) => {
@@ -119,7 +119,7 @@ function SideBar() {
                         ? "bg-orange-500/10 border-red-500/[0.18]"
                         : "bg-transparent border-transparent"
                     }`}
-                onClick={() => dispatch(setSelectedConversation(conv))}
+                onClick={() => { dispatch(setSelectedConversation(conv)); onClose(); }}
               >
                 <div
                   className={`flex items-center justify-center shrink-0 w-[20px] h-[20px]
@@ -155,9 +155,12 @@ function SideBar() {
   }
 
   return (
-    <div className="fixed lg:static inset-y-0 left-0 z-50 w-[270px] h-screen shrink-0 bg-[#050505] border-r border-white/[0.06]">
-      <div className="flex flex-col h-full">
-        <div className="flex items-center gap-2.5  px-4 py-5 border-b border-white/[0.06]">
+    <>
+    {mobileOpen && <button aria-label="Close sidebar" onClick={onClose} className="fixed inset-0 z-40 bg-black/60 lg:hidden" />}
+    <div className={`${mobileOpen ? "flex" : "hidden lg:flex"} fixed lg:static inset-y-0 left-0 z-50 w-[270px] max-w-[85vw] h-dvh min-h-0 shrink-0 bg-[#050505] border-r border-white/[0.06]`}>
+
+      <div className="flex h-full min-h-0 w-full flex-col overflow-hidden">
+        <div className="flex shrink-0 items-center gap-2.5 px-4 py-5 border-b border-white/[0.06]">
           <div
             className="hidden lg:flex items-center justify-center w-7 h-7 rounded-lg
             text-slate-500 hover:text-slate-200 hover:bg-white/[005]
@@ -180,19 +183,19 @@ function SideBar() {
             className="flex items-center justify-center w-7 rounded-lg text-slate-500 hover:text-slate-200
               hover:bg-white/[0.05] transition-colors duration-150 bg-transparent border-none cursor-pointer
               "
-            onClick={()=>dispatch(setSelectedConversation(null))}
+            onClick={()=>{ dispatch(setSelectedConversation(null)); onClose(); }}
           >
             <SquarePen size={15} />
           </button>
         </div>
 
-        <div className="px-4 pt-4 pb-1">
+        <div className="shrink-0 px-4 pt-4 pb-1">
           <button
             className="w-full flex items-center justify-center gap-2 text-sm font-medium text-white font-Inter
                 bg-linear-to-br from-red-600 to-orange-700 rounded-4xl hover:from-orange-700 hover:to-red-600  
                                 border border-red-950 py-[10px] cursor-pointer hover:shadow-[0_1px_8px_rgba(234,70,35,0.35)] 
                 transition-opacity duration-150"
-            onClick={()=>dispatch(setSelectedConversation(null))}
+            onClick={()=>{ dispatch(setSelectedConversation(null)); onClose(); }}
           >
             <MessageSquarePlus size={20} />
             New Chat
@@ -200,7 +203,7 @@ function SideBar() {
         </div>
 
         {conversations.length == 0 ? (
-          <div className="px-5 pt-4 pb-1.5 text-[10.5px] font-bold font-inter uppercase tracking-widest text-slate-600 ">
+          <div className="shrink-0 px-5 pt-4 pb-1.5 text-[10.5px] font-bold font-inter uppercase tracking-widest text-slate-600 ">
             No Recent Conversations
           </div>
         ) : (
@@ -250,7 +253,7 @@ function SideBar() {
 
         <div className="mx-2.5 h-px bg-white/[0.06]" />
 
-        <div className="px-3.5 py-3.5">
+        <div className="shrink-0 px-3.5 py-3.5">
           {userData ? (
             <div
               className="flex items-center gap-2.5 cursor-pointer rounded-xl
@@ -312,6 +315,7 @@ function SideBar() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 
