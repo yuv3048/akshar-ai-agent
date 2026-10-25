@@ -118,12 +118,12 @@ function ChatInput() {
   ]
 
   return (
-    <div className='w-full overflow-hidden px-3 md:px-5 py-4
+    <div className='w-full shrink-0 overflow-hidden px-3 md:px-5 py-2 md:py-4
       border-t border-white/[0.06] bg-[#000000]'>
       <div className='flex flex-col gap-2 bg-white/[0.03] border
-        border-white/[0.07] rounded-2xl px-4 pt-3.5 pb-3'>
+        border-white/[0.07] rounded-2xl px-3 md:px-4 pt-2.5 md:pt-3.5 pb-2 md:pb-3'>
 
-          <div className='flex w-[80%] gap-2 pr-2 flex-wrap'>
+          <div className='flex w-full gap-1.5 pr-1 flex-wrap max-h-[76px] overflow-y-auto'>
               {agents.map((agent)=>{
                   const isActive = selectedAgent === agent.label
                   const Icon = agent.icon
@@ -170,7 +170,8 @@ function ChatInput() {
           className='w-full bg-transparent outline-none resize-none text-[14px]
            text-slate-200 placeholder:text-slate-600 leading-relaxed [scrollbar-width:none]
           [&::-webkit-scrollbar]:hidden disabled:opacity-50' 
-          rows={3}/>
+          rows={2}
+          className='w-full max-h-[18dvh] min-h-[44px] overflow-y-auto bg-transparent outline-none resize-none text-[14px] text-slate-200 placeholder:text-slate-600 leading-relaxed [scrollbar-width:none] [&::-webkit-scrollbar]:hidden disabled:opacity-50' />
           <div className='flex items-center justify-between'>
             <div className='flex items-centr gap-1'>
               <button className='flex items-center justify-center w-8 h-8 rounded-lg text-slate-300
