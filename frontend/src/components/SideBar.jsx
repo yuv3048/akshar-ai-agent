@@ -207,13 +207,13 @@ function SideBar({ mobileOpen = false, onClose = () => {} }) {
             No Recent Conversations
           </div>
         ) : (
-          <div className="px-5 pt-4 pb-1.5 text-[10.5px] font-bold font-inter uppercase tracking-widest text-slate-600 ">
+          <div className="shrink-0 px-5 pt-4 pb-1.5 text-[10.5px] font-bold font-inter uppercase tracking-widest text-slate-600 ">
             Recents
           </div>
         )}
 
         <div
-          className="flex-1 overflow-y-auto px-2.5 pb-2 [scrollbar-width:none]
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2.5 pb-2 [scrollbar-width:none]
           [&::-webkit-scrollbar]:hidden"
         >
           {conversations.map((conv, i) => {
