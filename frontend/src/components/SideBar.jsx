@@ -115,9 +115,9 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
           onClick={onMobileClose}
         />
       )}
-      <aside className={`fixed inset-y-0 left-0 z-50 h-screen w-[270px] shrink-0 border-r border-white/[0.06] bg-[#050505] transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} ${collapsed ? "lg:hidden" : "lg:static lg:translate-x-0"}`}>
-      <div className="flex flex-col h-full">
-        <div className="flex items-center gap-2.5 px-4 py-5 border-b border-white/[0.06]">
+      <aside className={`fixed inset-y-0 left-0 z-50 h-[100dvh] w-[270px] shrink-0 overflow-hidden border-r border-white/[0.06] bg-[#050505] transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} ${collapsed ? "lg:hidden" : "lg:static lg:translate-x-0"}`}>
+      <div className="flex h-full min-h-0 flex-col overflow-hidden">
+        <div className="flex shrink-0 items-center gap-2.5 px-4 py-5 border-b border-white/[0.06]">
            <img
               src="./akshar-logo.svg"
               alt="Akshar AI"
@@ -147,7 +147,7 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
           </button>
         </div>
 
-        <div className="px-4 pt-4 pb-1">
+        <div className="shrink-0 px-4 pt-4 pb-1">
           <button
             className="w-full flex items-center justify-center gap-2 text-sm font-medium text-white font-Inter
                 bg-linear-to-br from-red-600 to-orange-700 rounded-4xl hover:from-orange-700 hover:to-red-600  
@@ -162,17 +162,17 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
         </div>
 
         {conversations.length == 0 ? (
-          <div className="px-5 pt-4 pb-1.5 text-[10.5px] font-bold font-inter uppercase tracking-widest text-slate-600 ">
+          <div className="shrink-0 px-5 pt-4 pb-1.5 text-[10.5px] font-bold font-inter uppercase tracking-widest text-slate-600 ">
             No Recent Conversations
           </div>
         ) : (
-          <div className="px-5 pt-4 pb-1.5 text-[10.5px] font-bold font-inter uppercase tracking-widest text-slate-600 ">
+          <div className="shrink-0 px-5 pt-4 pb-1.5 text-[10.5px] font-bold font-inter uppercase tracking-widest text-slate-600 ">
             Recents
           </div>
         )}
 
         <div
-          className="flex-1 overflow-y-auto px-2.5 pb-2 [scrollbar-width:none]
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2.5 pb-2 [scrollbar-width:none]
           [&::-webkit-scrollbar]:hidden"
         >
           {conversations.map((conv, i) => {
@@ -210,9 +210,9 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
           })}
         </div>
 
-        <div className="mx-2.5 h-px bg-white/[0.06]" />
+        <div className="mx-2.5 h-px shrink-0 bg-white/[0.06]" />
 
-        <div className="px-3.5 py-3.5">
+        <div className="shrink-0 px-3.5 py-3.5">
           {userData ? (
             <div
               className="flex items-center gap-2.5 cursor-pointer rounded-xl
