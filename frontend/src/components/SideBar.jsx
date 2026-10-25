@@ -166,7 +166,7 @@ function SideBar({ mobileOpen = false, onClose = () => {} }) {
             No Recent Conversations
           </div>
         ) : (
-          <div className="px-5 pt-4 pb-1.5 text-[10.5px] font-bold font-inter uppercase tracking-widest text-slate-600 ">
+          <div className="shrink-0 px-5 pt-4 pb-1.5 text-[10.5px] font-bold font-inter uppercase tracking-widest text-slate-600 ">
             Recents
           </div>
         )}
