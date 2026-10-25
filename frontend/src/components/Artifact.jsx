@@ -186,6 +186,7 @@ function Artifact() {
       </div>
 
        <motion.div
+        className="hidden lg:block"
         initial={{width: 500}}
         animate={{width:collapsed?48:500}}
         transition={{
