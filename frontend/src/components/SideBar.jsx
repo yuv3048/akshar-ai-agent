@@ -6,6 +6,7 @@ import {
   MessageSquareText,
   PanelLeft,
   PanelRight,
+  Slash,
 
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -20,11 +21,13 @@ import {
 import logOut from "../features/logOut.js";
 import { setUserdata } from "../redux/userSlice.js";
 import { setArtifacts, setMessages } from "../redux/messageSlice";
+import BillingDrawer from "./BillingDrawer.jsx";
 
 function SideBar({ mobileOpen = false, onMobileClose }) {
   const [collapsed, setCollapsed] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [creatingConversation, setCreatingConversation] = useState(false);
+  const [showBilling, setShowBilling] = useState(false)
 
   const dispatch = useDispatch();
 
@@ -115,9 +118,15 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
       <aside className={`fixed inset-y-0 left-0 z-50 h-screen w-[270px] shrink-0 border-r border-white/[0.06] bg-[#050505] transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} ${collapsed ? "lg:hidden" : "lg:static lg:translate-x-0"}`}>
       <div className="flex flex-col h-full">
         <div className="flex items-center gap-2.5 px-4 py-5 border-b border-white/[0.06]">
-          <span className="font-doto text-[20px] font-bold text-slate-300 flex-1">
-            Akshar AI
-          </span>
+           <img
+              src="./akshar-logo.svg"
+              alt="Akshar AI"
+              className="w-8 h-8 scale-160"
+            />
+            <span className='font-space font-bold text-[16px] text-slate-500'>/</span>
+            <span className="font-doto text-[20px] font-bold text-slate-300 flex-1">
+               Akshar AI
+            </span>
           <button
             type="button"
             aria-label="Collapse sidebar"
@@ -233,6 +242,7 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
               </div>
               <div className="flex gap-1">
                 <button
+                  onClick={()=>setShowBilling(true)}
                   className="flex items-center justify-center w-7 h-7 rounded-[7px]
                         border-none bg-transparent text-yellow-600 cursor-pointer hover:bg-white/[0.08]
                         hover:text-slate-400 transition-all duration-150"
@@ -265,6 +275,11 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
         </div>
       </div>
       </aside>
+          
+          <BillingDrawer
+            open={showBilling}
+            onClose={()=>setShowBilling(false)}
+          />
     </>
   );
 }

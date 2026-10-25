@@ -19,8 +19,13 @@ function Nav({ onOpenSidebar }) {
       </button>
 
 
-      <span className="font-doto font-bold text-sm tracking-wide text-slate-100 min-w-0 flex-1 truncate">
-        {selectedConversation?.title || "Akshar AI"}
+      <span className="flex items-center font-space font-bold text-sm tracking-wide text-slate-400 min-w-0 flex-1 truncate">
+        <img
+              src="./akshar-logo.svg"
+              alt="Akshar AI"
+              className="w-8 h-8 scale-150"
+        />
+         : {selectedConversation?.title || "Akshar AI"}
       </span>
 
       <div className="text-[11px] font-inter font-medium text-slate-500 bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 rounded-full tracking-tight whitespace-nowrap shrink-0">
