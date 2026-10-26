@@ -126,55 +126,73 @@ export const updateUserPayment = async (req, res) => {
   }
 };
 
-export const deductCredits = async (req, res)=>{
-   try{
-      const {userId, agent} = req.body
+export const deductCredits = async (req, res) => {
+  try {
+    const { userId, agent } = req.body ?? {};
 
-      const COST = {
-        chat: 1,
-        search: 5,
-        coding: 10,
-        pdf: 10,
-        ppt: 10,
-        vision: 15,
+    if (!userId || typeof agent !== "string") {
+      return res.status(400).json({ message: "userId and agent are required" });
+    }
+
+    const COST = {
+      chat: 1,
+      search: 5,
+      coding: 10,
+      pdf: 10,
+      ppt: 10,
+      image: 15,
+      vision: 15,
+    };
+
+    const requiredCredits = COST[agent];
+    if (requiredCredits === undefined) {
+      return res.status(400).json({ message: "Invalid agent type" });
+    }
+
+    // A single conditional update prevents two concurrent requests from
+    // spending the same remaining credits.
+    const user = await User.findOneAndUpdate(
+      { _id: userId, credits: { $gte: requiredCredits } },
+      { $inc: { credits: -requiredCredits } },
+      { new: true, runValidators: true }
+    );
+
+    if (!user) {
+      const exists = await User.exists({ _id: userId });
+      if (!exists) {
+        return res.status(404).json({ message: "User not found" });
       }
+      return res.status(400).json({
+        message: "Not enough credits.",
+        requiredCredits,
+      });
+    }
 
-      const user = await User.findById(userId);
-
-      if(!user){
-        return res.status(400).json({message:"user not found"})
-      }
-
-      const requiredCredits = COST[agent] || 1;
-
-      if(user.credits < requiredCredits){
-        return res.status(400).json({message:"Not enough credits."})
-      }
-
-      user.credits -= requiredCredits
-
-      const sessionId = await redis.get(`user-session-${user._id}`);
-
-      if (sessionId) {
+    // Keep the current known session cache in sync. MongoDB remains the
+    // source of truth for the balance.
+    const sessionId = await redis.get(`user-session-${user._id}`);
+    if (sessionId) {
+      const sessionKey = `session-${sessionId}`;
+      const sessionValue = await redis.get(sessionKey);
+      if (sessionValue) {
+        const session = JSON.parse(sessionValue);
         await redis.set(
-          `session-${sessionId}`,
-          JSON.stringify({
-            userId: user._id,
-            name: user.name,
-            email: user.email,
-            avatar: user.avatar,
-            plan: user.plan,
-            credits: user.credits,
-            totalCredits: user.totalCredits,
-            planExpiresAt: user.planExpiresAt,
-          }),
+          sessionKey,
+          JSON.stringify({ ...session, credits: user.credits }),
           "EX",
           SESSION_SECONDS
         );
       }
+    }
 
-      return res.status(200).json({success: true, credits: user.credits})
-   }catch(error){
-      return res.status(500).json({message: `deduct credits error ${error}`})
-   }
+    return res.status(200).json({
+      success: true,
+      credits: user.credits,
+      deductedCredits: requiredCredits,
+      agent,
+    });
+  } catch (error) {
+    console.error("Deduct credits error:", error);
+    return res.status(500).json({ message: "Failed to deduct credits" });
+  }
 }
