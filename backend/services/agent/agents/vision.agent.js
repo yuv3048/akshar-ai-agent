@@ -213,7 +213,7 @@ const aksharAiDownloadUrl =
   `${baseUrl}/api/agent/images/${encodeURIComponent(filename)}`;
 
 
-  await deductCredits(state.userId, "image");
+  await deductCredits(state.userId, "vision");
 
 return {
   ...state,
