@@ -170,19 +170,25 @@ export const deductCredits = async (req, res) => {
 
     // Keep the current known session cache in sync. MongoDB remains the
     // source of truth for the balance.
-    const sessionId = await redis.get(`user-session-${user._id}`);
-    if (sessionId) {
-      const sessionKey = `session-${sessionId}`;
-      const sessionValue = await redis.get(sessionKey);
-      if (sessionValue) {
-        const session = JSON.parse(sessionValue);
-        await redis.set(
-          sessionKey,
-          JSON.stringify({ ...session, credits: user.credits }),
-          "EX",
-          SESSION_SECONDS
-        );
+    try {
+      const sessionId = await redis.get(`user-session-${user._id}`);
+      if (sessionId) {
+        const sessionKey = `session-${sessionId}`;
+        const sessionValue = await redis.get(sessionKey);
+        if (sessionValue) {
+          const session = JSON.parse(sessionValue);
+          await redis.set(
+            sessionKey,
+            JSON.stringify({ ...session, credits: user.credits }),
+            "EX",
+            SESSION_SECONDS
+          );
+        }
       }
+    } catch (sessionError) {
+      // MongoDB is authoritative. A cache failure must not turn a completed
+      // deduction into a reported failure that could trigger unsafe retries.
+      console.error("Credit deduction succeeded but session cache update failed:", sessionError);
     }
 
     return res.status(200).json({
