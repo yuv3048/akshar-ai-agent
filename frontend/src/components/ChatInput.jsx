@@ -1,6 +1,8 @@
 import { Code2, FileText, Globe2, ImageIcon, MessageSquare, MicAudioLines, Paperclip, Presentation, Send, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import sendMessage from "../features/sendMessage.js";
+import getCurrentUser from "../features/getCurrentUser.js";
+import { setUserdata } from "../redux/userSlice.js";
 import { useDispatch, useSelector } from "react-redux";
 import { addMessage, setArtifacts, setMessages } from "../redux/messageSlice";
 import { createConversation } from "../features/createConversation.js";
@@ -55,6 +57,11 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
       }
 
       dispatch(setArtifacts(data.artifacts ?? []));
+      // Refresh the persisted account balance after each completed agent request.
+      // This keeps the navbar/billing UI accurate across sessions and devices.
+      const currentUser = await getCurrentUser();
+      if (currentUser) dispatch(setUserdata(currentUser));
+
       dispatch(addMessage({
         role: "assistant",
         content: data.answer,
