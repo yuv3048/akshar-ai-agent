@@ -86,12 +86,12 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
 
   return (
     <>
-      <aside className={`hidden h-screen w-14 shrink-0 flex-col items-center gap-2 border-r border-white/[0.06] bg-[#050505] py-4 lg:flex ${collapsed ? "" : "lg:hidden"}`}>
+      <aside className={`hidden h-screen w-14 shrink-0 flex-col items-center gap-2 border-r border-white/6 bg-[#050505] py-4 lg:flex ${collapsed ? "" : "lg:hidden"}`}>
         <button
           type="button"
           aria-label="Expand sidebar"
           title="Expand sidebar"
-          className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-orange-300"
+          className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-400 transition-colors hover:bg-white/6 hover:text-orange-300"
           onClick={() => setCollapsed(false)}
         >
           <PanelRight size={19} />
@@ -115,9 +115,9 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
           onClick={onMobileClose}
         />
       )}
-      <aside className={`fixed inset-y-0 left-0 z-50 h-[100dvh] w-[270px] shrink-0 overflow-hidden border-r border-white/[0.06] bg-[#050505] transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} ${collapsed ? "lg:hidden" : "lg:static lg:translate-x-0"}`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 h-dvh w-67.5 shrink-0 overflow-hidden border-r border-white/6 bg-[#050505] transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} ${collapsed ? "lg:hidden" : "lg:static lg:translate-x-0"}`}>
       <div className="flex h-full min-h-0 flex-col overflow-hidden">
-        <div className="flex shrink-0 items-center gap-2.5 px-4 py-5 border-b border-white/[0.06]">
+        <div className="flex shrink-0 items-center gap-2.5 px-4 py-5 border-b border-white/6">
            <img
               src="./akshar-logo.svg"
               alt="Akshar AI"
@@ -131,7 +131,7 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
             type="button"
             aria-label="Collapse sidebar"
             title="Collapse sidebar"
-            className="hidden lg:flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-orange-300"
+            className="hidden lg:flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 transition-colors hover:bg-white/6 hover:text-orange-300"
             onClick={() => setCollapsed(true)}
           >
             <PanelLeft size={19} />
@@ -140,7 +140,7 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
             type="button"
             aria-label="Close sidebar"
             title="Close sidebar"
-            className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 transition-colors hover:bg-white/[0.06] hover:text-slate-200 lg:hidden"
+            className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 transition-colors hover:bg-white/6 hover:text-slate-200 lg:hidden"
             onClick={onMobileClose}
           >
             <PanelLeft size={19} />
@@ -151,7 +151,7 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
           <button
             className="w-full flex items-center justify-center gap-2 text-sm font-medium text-white font-Inter
                 bg-linear-to-br from-red-600 to-orange-700 rounded-4xl hover:from-orange-700 hover:to-red-600  
-                                border border-red-950 py-[10px] cursor-pointer hover:shadow-[0_1px_8px_rgba(234,70,35,0.35)] 
+                                border border-red-950 py-2.5 cursor-pointer hover:shadow-[0_1px_8px_rgba(234,70,35,0.35)] 
                 transition-opacity duration-150"
             onClick={async () => { await handleNewChat(); onMobileClose?.(); }}
             disabled={creatingConversation}
@@ -172,7 +172,7 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
         )}
 
         <div
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2.5 pb-2 [scrollbar-width:none]
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2.5 pb-2 scrollbar-width:none
           [&::-webkit-scrollbar]:hidden"
         >
           {conversations.map((conv, i) => {
@@ -183,17 +183,17 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
                 className={`flex items-center gap-2.5 cursor-pointer mb-0.5 px-3 py-2.5 font-inter border transition-colors duration-150 
                     ${
                       isActive
-                        ? "bg-orange-500/10 border-red-500/[0.18] rounded-r-lg border-l-2 border-l-orange-600"
+                        ? "bg-orange-500/10 border-red-500/18 rounded-r-lg border-l-2 border-l-orange-600"
                         : "bg-transparent border-transparent"
                     }`}
                 onClick={() => { dispatch(setMessages([])); dispatch(setArtifacts([])); dispatch(setSelectedConversation(conv)); onMobileClose?.(); }}
               >
                 <div
-                  className={`flex items-center justify-center shrink-0 w-[28px] h-[28px]
+                  className={`flex items-center justify-center shrink-0 w-7 h-7
                           rounded-lg transition-colors duration-150 ${
                             isActive
                               ? "bg-red-700/15 text-orange-600 "
-                              : "bg-white/[0.05] text-slate-500"
+                              : "bg-white/5 text-slate-500"
                           }`}
                 >
                   <MessageSquareText size={15} />

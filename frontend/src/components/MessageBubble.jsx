@@ -32,7 +32,7 @@ function MessageBubble({role, content, images, assetPreviewUrl, assetDownloadUrl
 
   return (
     <div className={`flex ${isUser? "justify-end" : "justify-start"}`}>
-      <div className={`max-w-[92vw] ${isUser ? "md:max-w-[72%]" : "w-full max-w-full"} px-4 py-2.5 rounded-2xl font-inter break-words overflow-hidden leading-relaxed
+      <div className={`max-w-[92vw] ${isUser ? "md:max-w-[72%]" : "w-full max-w-full"} px-4 py-2.5 rounded-2xl font-inter wrap-break-words overflow-hidden leading-relaxed
         ${isUser?
           'my-2 font-inter bg-linear-to-r from-red-600 to-orange-700 text-white rounded-tr-sm'
           : 
@@ -75,7 +75,7 @@ function MessageBubble({role, content, images, assetPreviewUrl, assetDownloadUrl
               </h3>
             ),
             p:({children})=>(
-              <p className='mb-3 whitespace-pre-wrap break-words'>{children}</p>
+              <p className='mb-3 whitespace-pre-wrap wrap-break-words'>{children}</p>
             ),
             ul:({children})=>(
               <ul className='list-disc pl-5 space-y-1 my-2'>{children}</ul>
@@ -91,7 +91,7 @@ function MessageBubble({role, content, images, assetPreviewUrl, assetDownloadUrl
               </div>
             ),
             thead: ({ children }) => (
-              <thead className="bg-white/[0.06]">
+              <thead className="bg-white/6">
                 {children}
               </thead>
             ),
@@ -101,7 +101,7 @@ function MessageBubble({role, content, images, assetPreviewUrl, assetDownloadUrl
               </tbody>
             ),
             tr: ({ children }) => (
-              <tr className="hover:bg-white/[0.02]">
+              <tr className="hover:bg-white/2">
                 {children}
               </tr>
             ),
@@ -179,7 +179,7 @@ function MessageBubble({role, content, images, assetPreviewUrl, assetDownloadUrl
             },
             hr: () => (
               <hr className="my-6 h-px border-0
-                bg-gradient-to-r
+                bg-linear-to-r
                 from-orange-500/50  to-red-700/50"
               />
             ),
@@ -192,7 +192,7 @@ function MessageBubble({role, content, images, assetPreviewUrl, assetDownloadUrl
                   console.error("Markdown image failed to load:", src);
                 }}
                 onClick={() => setLightBox(src)}
-                className="my-3 block max-w-full max-h-[280px] sm:max-h-[420px]
+                className="my-3 block max-w-full max-h-70 sm:max-h-105
                   rounded-xl border border-white/10 object-contain
                   cursor-zoom-in hover:border-orange-500/40 transition-colors"
               />

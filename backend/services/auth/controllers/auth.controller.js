@@ -7,8 +7,8 @@ import crypto from "crypto";
 const SESSION_SECONDS = 7 * 24 * 60 * 60;
 const sessionCookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "strict",
+  secure: false,
+  sameSite: "lax",
   path: "/",
   maxAge: SESSION_SECONDS * 1000,
 };

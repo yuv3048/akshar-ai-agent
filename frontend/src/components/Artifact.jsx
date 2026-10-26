@@ -138,7 +138,7 @@ function Artifact() {
             <header className="flex min-h-14 items-center gap-2 border-b border-white/10 px-3">
               <button type="button" onClick={() => setMobileOpen(false)} aria-label="Collapse artifact" title="Collapse artifact" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-300 hover:bg-white/10"><PanelRightClose size={19} /></button>
               <Code2 size={17} className="shrink-0 text-orange-400" />
-              <h2 className="min-w-0 flex-1 truncate text-sm font-medium">{artifacts[0]?.title}</h2>
+              <h2 className="min-w-0 flex-1 truncate font-space text-sm font-medium">{artifacts[0]?.title}</h2>
               <button type="button" onClick={handleCopy} aria-label="Copy current file" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-300 hover:bg-white/10">
                 {copied ? <Check size={17} /> : <Copy size={17} />}
               </button>
@@ -150,7 +150,7 @@ function Artifact() {
                 {artifacts[0].files?.map((f, index) => (
                   <button key={`${f.name}-mobile-${index}`} type="button" onClick={() => setActiveFile(index)} className={`relative shrink-0 border-r border-white/5 px-3 py-3 text-xs ${activeFile === index ? "text-orange-400" : "text-slate-400"}`}>
                     {f.name}
-                    {activeFile === index && <span className="absolute inset-x-0 bottom-0 h-0.5 bg-orange-500" />}
+                    {activeFile === index && <span className="absolute inset-x-0 bottom-0 h-0.5 bg-orange-600" />}
                   </button>
                 ))}
               </div>
@@ -176,8 +176,8 @@ function Artifact() {
               </div>
               {canPreview && (
                 <div className="grid grid-cols-2 gap-2">
-                  <button type="button" onClick={() => setTab("code")} className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm ${tab === "code" ? "border-orange-500/40 bg-orange-500/15 text-white" : "border-white/10 text-slate-400"}`}><Code2 size={16} /> Code</button>
-                  <button type="button" onClick={() => setTab("preview")} className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm ${tab === "preview" ? "border-orange-500/40 bg-orange-500/15 text-white" : "border-white/10 text-slate-400"}`}><EyeDashed size={16} /> Preview</button>
+                  <button type="button" onClick={() => setTab("code")} className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm ${tab === "code" ? "font-doto font-extrabold bg-linear-to-br from-orange-600 to-red-700 text-white border-none" : "font-doto font-extrabold border-white/10 text-slate-400"}`}><Code2 size={16} /> Code</button>
+                  <button type="button" onClick={() => setTab("preview")} className={`flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm ${tab === "preview" ? "font-doto font-extrabold bg-linear-to-br from-orange-600 to-red-700 text-white border-none" : "font-doto font-extrabold border-white/10 text-slate-400"}`}><EyeDashed size={16} /> Preview</button>
                 </div>
               )}
             </footer>
@@ -194,7 +194,7 @@ function Artifact() {
           ease:easeInOut
         }}
       >
-    <div className="hidden lg:flex h-full border-1 border-white/[0.06] flex-col overflow-hidden shrink-0">
+    <div className="hidden lg:flex h-full border-l border-white/[0.06] flex-col overflow-hidden shrink-0">
       {!collapsed?<div className="flex flex-col h-full bg-[#000000]">
         <div className="h-14 px-4 border-b border-white/[0.06] flex items-center gap-3 shrink-0">
           <button className="flex items-center justify-center w-7 h-7 rounded-1g text-slate-500
