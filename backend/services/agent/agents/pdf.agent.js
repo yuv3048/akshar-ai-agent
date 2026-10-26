@@ -3,6 +3,7 @@ import { getModel } from "../config/llmModel.js";
 import { generatePdf } from "../utils/generatePdf.js";
 import { uploadToS3 } from "../utils/uploadToS3.js";
 import redis from "../../../shared/redis/redis.js";
+import { deductCredits } from "../utils/deductCredits.js";
 
 const extractText = (content) => {
   if (typeof content === "string") return content;
@@ -141,6 +142,8 @@ Use exactly this structure, with no extra keys:
 
     const previewUrl = `${baseUrl}/api/agent/preview/${encodeURIComponent(filename)}`;
     const downloadUrl = `${baseUrl}/api/agent/images/${encodeURIComponent(filename)}`;
+
+    await deductCredits(state.userId, "pdf");
 
     return {
       ...state,

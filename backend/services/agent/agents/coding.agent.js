@@ -1,4 +1,5 @@
 import { getModel } from "../config/llmModel.js";
+import { deductCredits } from "../utils/deductCredits.js";
 
 const INTENTS = new Set([
   "CODE_GENERATION",
@@ -440,6 +441,8 @@ ${userPrompt}
     const data = await generateProject(llm, userPrompt);
     const artifactTitle = await generateArtifactTitle(intentLlm, userPrompt);
 
+    await deductCredits(state.userId, "coding");
+
     return {
       ...state,
       aiResponse:
@@ -480,6 +483,8 @@ ${userPrompt}
 
 Return the answer in Markdown.
 `);
+
+  await deductCredits(state.userId, "coding");
 
   return {
     ...state,

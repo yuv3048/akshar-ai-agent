@@ -3,6 +3,7 @@ import axios from 'axios';
 import { randomUUID } from 'node:crypto';
 import { uploadToS3 } from '../utils/uploadToS3.js';
 import redis from '../../../shared/redis/redis.js';
+import { deductCredits } from '../utils/deductCredits.js';
 
 export const visionAgent = async(state)=>{
 
@@ -210,6 +211,9 @@ const aksharAiPreviewUrl =
 
 const aksharAiDownloadUrl =
   `${baseUrl}/api/agent/images/${encodeURIComponent(filename)}`;
+
+
+  await deductCredits(state.userId, "image");
 
 return {
   ...state,

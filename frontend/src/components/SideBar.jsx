@@ -115,7 +115,7 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
           onClick={onMobileClose}
         />
       )}
-      <aside className={`fixed inset-y-0 left-0 z-50 h-dvh w-67.5 shrink-0 overflow-hidden border-r border-white/6 bg-[#050505] transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} ${collapsed ? "lg:hidden" : "lg:static lg:translate-x-0"}`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 h-dvh w-70 shrink-0 overflow-hidden border-r border-white/6 bg-[#050505] transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} ${collapsed ? "lg:hidden" : "lg:static lg:translate-x-0"}`}>
       <div className="flex h-full min-h-0 flex-col overflow-hidden">
         <div className="flex shrink-0 items-center gap-2.5 px-4 py-5 border-b border-white/6">
            <img
@@ -127,6 +127,14 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
             <span className="font-doto text-[20px] font-bold text-slate-300 flex-1">
                Akshar AI
             </span>
+            <button
+              onClick={()=>setShowBilling(true)}
+              className="flex items-center justify-center w-7 h-7 rounded-[7px]
+                    border-none bg-transparent text-yellow-600 cursor-pointer hover:bg-white/[0.08]
+                    hover:text-slate-400 transition-all duration-150"
+            >
+              <BadgeDollarSign size={16} />
+            </button>
           <button
             type="button"
             aria-label="Collapse sidebar"
@@ -241,14 +249,6 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
                 </p>
               </div>
               <div className="flex gap-1">
-                <button
-                  onClick={()=>setShowBilling(true)}
-                  className="flex items-center justify-center w-7 h-7 rounded-[7px]
-                        border-none bg-transparent text-yellow-600 cursor-pointer hover:bg-white/[0.08]
-                        hover:text-slate-400 transition-all duration-150"
-                >
-                  <BadgeDollarSign size={16} />
-                </button>
                 <button
                   className="flex items-center justify-center w-7 h-7 rounded-[7px]
                           border-none bg-transparent text-red-600 cursor-pointer hover:bg-white/[0.08]

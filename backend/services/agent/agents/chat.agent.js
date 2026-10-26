@@ -7,6 +7,7 @@ import {
 import { getModel } from "../config/llmModel.js";
 import { getMemory } from "../config/memory.js";
 import redis from "../../../shared/redis/redis.js";
+import { deductCredits } from "../utils/deductCredits.js";
 
 export const chatAgent = async (state) => {
   try {
@@ -116,6 +117,8 @@ Choose formatting according to the content and the user's request. A good answer
     const aiResponse = typeof response.content === "string"
       ? response.content
       : JSON.stringify(response.content);
+
+    await deductCredits(state.userId, "chat");
 
     return { ...state, aiResponse };
   } catch (error) {

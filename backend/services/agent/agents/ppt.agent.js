@@ -3,6 +3,7 @@ import { getModel } from "../config/llmModel.js";
 import { generatePpt } from "../utils/generatePpt.js";
 import { uploadToS3 } from "../utils/uploadToS3.js";
 import redis from "../../../shared/redis/redis.js";
+import { deductCredits } from "../utils/deductCredits.js";
 
 const extractText = (content) => {
   if (typeof content === "string") return content;
@@ -147,6 +148,8 @@ Return 5–8 slides. Every slide must contain a title and 2–4 concise points (
 
     const previewUrl = `${baseUrl}/api/agent/preview/${encodeURIComponent(filename)}`;
     const downloadUrl = `${baseUrl}/api/agent/images/${encodeURIComponent(filename)}`;
+
+    await deductCredits(state.userId, "ppt");
 
     return {
       ...state,
