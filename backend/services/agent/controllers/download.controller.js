@@ -1,5 +1,6 @@
+import { GetObjectCommand } from "@aws-sdk/client-s3";
 import redis from "../../../shared/redis/redis.js";
-import { getFromS3 } from "../utils/getFromS3.js";
+import { s3 } from "../config/s3.js";
 
 export const downloadAsset = async (req, res) => {
   try {
@@ -20,11 +21,21 @@ export const downloadAsset = async (req, res) => {
     if (String(asset?.userId) !== String(userId)) {
       return res.status(404).json({ message: "File not found" });
     }
-    const downloadUrl = await getFromS3(filename, 600, "attachment");
+
+    const result = await s3.send(new GetObjectCommand({
+      Bucket: process.env.AWS_S3_BUCKET,
+      Key: filename,
+    }));
+
     res.setHeader("Cache-Control", "private, no-store");
-    return res.redirect(302, downloadUrl);
+    res.setHeader("Content-Type", result.ContentType || "application/octet-stream");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename.replace(/["\r\n]/g, "_")}"`);
+    if (result.ContentLength != null) res.setHeader("Content-Length", result.ContentLength);
+
+    result.Body.pipe(res);
   } catch (error) {
     console.error("Asset download error:", error);
-    return res.status(500).json({ message: "Failed to download file" });
+    if (!res.headersSent) return res.status(500).json({ message: "Failed to download file" });
+    res.destroy(error);
   }
 };
