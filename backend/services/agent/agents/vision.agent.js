@@ -8,6 +8,9 @@ import { deductCredits } from '../utils/deductCredits.js';
 export const visionAgent = async(state)=>{
 
     try {
+    // Check and deduct credits before spending on generation or starting an S3 upload.
+    // Insufficient-credit requests must exit before any image upload begins.
+    await deductCredits(state.userId, "vision");
 
     const llm = await getModel("image");
     const res = await llm.invoke(`
@@ -213,8 +216,6 @@ const aksharAiDownloadUrl =
   `${baseUrl}/api/agent/images/${encodeURIComponent(filename)}`;
 
 
-  await deductCredits(state.userId, "vision");
-
 return {
   ...state,
   aiResponse: `
@@ -242,9 +243,14 @@ _Available for 7 days._
         url: error.config?.url
     });
 
+    const errorMessage = String(error.message || "");
+    const isInsufficientCredits = /not enough credits/i.test(errorMessage);
+
     return {
         ...state,
-        aiResponse: "❌ Image generation failed 🥺... "
+        aiResponse: isInsufficientCredits
+            ? "❌ You don't have enough credits to generate an image. Please upgrade your plan or add credits and try again."
+            : "❌ Image generation failed. Please try again in a moment."
     };
 }
 }
