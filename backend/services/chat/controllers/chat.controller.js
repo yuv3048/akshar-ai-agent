@@ -21,8 +21,35 @@ export const getConversation = async (req, res) => {
     const userId = getUserId(req);
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-    const conversations = await Conversation.find({ userId }).sort({ updatedAt: -1 });
-    return res.status(200).json(conversations);
+    const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 4, 1), 20);
+    const { beforeUpdatedAt, beforeId } = req.query;
+    const filter = { userId };
+
+    if (beforeUpdatedAt && beforeId) {
+      const cursorDate = new Date(beforeUpdatedAt);
+      if (Number.isNaN(cursorDate.getTime())) {
+        return res.status(400).json({ message: "Invalid conversation cursor" });
+      }
+      filter.$or = [
+        { updatedAt: { $lt: cursorDate } },
+        { updatedAt: cursorDate, _id: { $lt: beforeId } },
+      ];
+    }
+
+    const rows = await Conversation.find(filter)
+      .sort({ updatedAt: -1, _id: -1 })
+      .limit(limit + 1);
+    const hasMore = rows.length > limit;
+    const items = hasMore ? rows.slice(0, limit) : rows;
+    const last = items[items.length - 1];
+
+    return res.status(200).json({
+      items,
+      hasMore,
+      nextCursor: hasMore && last
+        ? { updatedAt: last.updatedAt, id: last._id }
+        : null,
+    });
   } catch (error) {
     console.error("Get conversations error:", error);
     return res.status(500).json({ message: "Failed to get conversations" });
@@ -97,8 +124,36 @@ export const getMessages = async (req, res) => {
     const conversation = await Conversation.findOne({ _id: conversationId, userId }).select("_id");
     if (!conversation) return res.status(404).json({ message: "Conversation not found" });
 
-    const messages = await Message.find({ conversationId }).sort({ createdAt: 1 });
-    return res.status(200).json(messages);
+    const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 20, 1), 100);
+    const { beforeCreatedAt, beforeId } = req.query;
+    const filter = { conversationId };
+
+    if (beforeCreatedAt && beforeId) {
+      const cursorDate = new Date(beforeCreatedAt);
+      if (Number.isNaN(cursorDate.getTime())) {
+        return res.status(400).json({ message: "Invalid message cursor" });
+      }
+      filter.$or = [
+        { createdAt: { $lt: cursorDate } },
+        { createdAt: cursorDate, _id: { $lt: beforeId } },
+      ];
+    }
+
+    // Fetch newest-first so the cursor always points to the oldest loaded item.
+    const rows = await Message.find(filter)
+      .sort({ createdAt: -1, _id: -1 })
+      .limit(limit + 1);
+    const hasMore = rows.length > limit;
+    const page = hasMore ? rows.slice(0, limit) : rows;
+    const oldest = page[page.length - 1];
+
+    return res.status(200).json({
+      items: page.reverse(),
+      hasMore,
+      nextCursor: hasMore && oldest
+        ? { createdAt: oldest.createdAt, id: oldest._id }
+        : null,
+    });
   } catch (error) {
     console.error("Get messages error:", error);
     return res.status(500).json({ message: "Failed to get messages" });
