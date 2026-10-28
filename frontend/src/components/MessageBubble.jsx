@@ -32,11 +32,11 @@ function MessageBubble({role, content, images, assetPreviewUrl, assetDownloadUrl
 
   return (
     <div className={`flex ${isUser? "justify-end" : "justify-start"}`}>
-      <div className={`max-w-[92vw] ${isUser ? "md:max-w-[72%]" : "w-full max-w-full"} px-4 py-2.5 rounded-2xl font-inter wrap-break-words overflow-hidden leading-relaxed
+      <div className={`max-w-[92vw] ${isUser ? "md:max-w-[72%]" : "w-full max-w-full"} px-4 py-3 rounded-2xl font-inter wrap-break-words overflow-hidden leading-7
         ${isUser?
-          'my-2 font-inter bg-linear-to-r from-red-600 to-orange-700 text-white rounded-tr-sm'
+          'my-2 border border-orange-400/15 bg-gradient-to-br from-orange-600 to-red-600 text-white rounded-tr-sm shadow-[0_8px_24px_rgba(0,0,0,0.18)]'
           : 
-          'my-2 font-inter bg-[#000000] text-slate-200 rounded-tl-sm'
+          'my-2 bg-transparent text-slate-200 rounded-tl-sm'
         }
         `}>
 
@@ -60,12 +60,12 @@ function MessageBubble({role, content, images, assetPreviewUrl, assetDownloadUrl
           remarkPlugins={[remarkGfm]}
           components={{
             h1: ({ children }) => (
-              <h1 className="font-space text-2xl font-bold mt-6 mb-3 tracking-tight">
+              <h1 className="mb-3 mt-7 font-space text-2xl font-bold tracking-tight text-white">
                 {children}
               </h1>
             ),
             h2: ({ children }) => (
-              <h2 className="font-space text-xl font-semibold mt-5 mb-2 tracking-tight">
+              <h2 className="mb-2 mt-6 font-space text-xl font-semibold tracking-tight text-white">
                 {children}
               </h2>
             ),
