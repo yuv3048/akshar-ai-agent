@@ -3,7 +3,7 @@ import { PanelLeft } from "lucide-react"
 
 function Nav({ onOpenSidebar }) {
   const { selectedConversation } = useSelector(state => state.conversation)
-  const { messages } = useSelector(state => state.message)
+  const { totalMessages } = useSelector(state => state.message)
 
 
   return (
@@ -29,7 +29,7 @@ function Nav({ onOpenSidebar }) {
       </span>
 
       <div className="text-[11px] font-inter font-medium text-slate-500 bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 rounded-full tracking-tight whitespace-nowrap shrink-0">
-        {messages?.length ?? 0} Messages
+        {totalMessages ?? 0} Messages
       </div>
 
     </div>
