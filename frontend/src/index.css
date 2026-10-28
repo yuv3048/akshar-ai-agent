@@ -15,3 +15,58 @@ body {
   background-color: #000000;
   color: #F5F5F5;
 }
+
+:root {
+  color-scheme: dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root {
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100dvh;
+}
+
+button, input, textarea, select {
+  font: inherit;
+}
+
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 2px solid rgb(249 115 22 / 65%);
+  outline-offset: 2px;
+}
+
+::selection {
+  color: #fff;
+  background: rgb(234 88 12 / 45%);
+}
+
+* {
+  scrollbar-color: rgb(255 255 255 / 14%) transparent;
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgb(255 255 255 / 14%);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgb(249 115 22 / 45%);
+}
