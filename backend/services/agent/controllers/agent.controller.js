@@ -25,12 +25,19 @@ const generateConversationTitle = async (prompt) => {
 
 export const agent = async (req, res) => {
   try {
-    const { prompt, conversationId, agent: requestedAgent, generateTitle = false } = req.body;
+    const { conversationId, agent: requestedAgent, generateTitle = false } = req.body ?? {};
     const userId = req.headers["x-user-id"];
+    const file = req.file ?? null;
+    const rawPrompt = typeof req.body?.prompt === "string" ? req.body.prompt.trim() : "";
+    const prompt = rawPrompt || (file
+      ? file.mimetype === "application/pdf"
+        ? "Summarize this PDF and identify its key points."
+        : "Describe this image and analyze its important details."
+      : "");
 
     if (!userId) return res.status(401).json({ message: "User ID missing" });
-    if (typeof prompt !== "string" || !prompt.trim() || prompt.length > 20000) {
-      return res.status(400).json({ message: "Prompt must be between 1 and 20000 characters" });
+    if (!prompt || prompt.length > 20000) {
+      return res.status(400).json({ message: "Enter a message or attach a PDF/image to analyze." });
     }
     if (!conversationId) {
       return res.status(400).json({ message: "Conversation ID is required" });
@@ -43,21 +50,18 @@ export const agent = async (req, res) => {
       return res.status(429).json({ message: "Too many requests. Please wait a minute and try again." });
     }
 
-    // Load existing history before persisting the current prompt, so the current
-    // prompt can be appended to Redis exactly once and remain available to the graph.
     await getMemory(conversationId, userId);
 
-    // This also verifies that the conversation belongs to this authenticated user.
     await axios.post(
       `${process.env.CHAT_SERVICE_URL}/save-message`,
-      { conversationId, role: "user", content: prompt.trim(), agent: requestedAgent },
+      { conversationId, role: "user", content: prompt, agent: file ? (file.mimetype === "application/pdf" ? "pdfRag" : "imageAnalyzer") : requestedAgent },
       { headers: { "x-user-id": userId } }
     );
 
-    await addMessage(conversationId, userId, "user", prompt.trim());
+    await addMessage(conversationId, userId, "user", prompt);
 
     const result = await graph.invoke({
-      prompt: prompt.trim(),
+      prompt,
       conversationId,
       userId,
       file,
@@ -83,19 +87,16 @@ export const agent = async (req, res) => {
 
     await addMessage(conversationId, userId, "assistant", response);
 
-    // Only the first message may set the title. The chat service enforces both
-    // ownership and the "New Chat" condition atomically.
     let title = null;
     if (generateTitle === true) {
       try {
         const titleResponse = await axios.post(
           `${process.env.CHAT_SERVICE_URL}/update-conversation`,
-          { id: conversationId, title: await generateConversationTitle(prompt.trim()), onlyIfNew: true },
+          { id: conversationId, title: await generateConversationTitle(prompt), onlyIfNew: true },
           { headers: { "x-user-id": userId } }
         );
         title = titleResponse.data?.title || null;
       } catch (error) {
-        // A title failure should not discard an otherwise successful answer.
         console.error("Conversation title generation failed:", error.response?.data || error.message);
       }
     }
