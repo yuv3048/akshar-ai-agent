@@ -8,10 +8,6 @@ import { deductCredits } from '../utils/deductCredits.js';
 export const visionAgent = async(state)=>{
 
     try {
-    // Check and deduct credits before spending on generation or starting an S3 upload.
-    // Insufficient-credit requests must exit before any image upload begins.
-    await deductCredits(state.userId, "vision");
-
     const llm = await getModel("image");
     const res = await llm.invoke(`
 You are Akshar AI's expert image-prompt writer. Your task is to transform the user's image request into a clear, visually descriptive prompt for an image-generation model.
@@ -187,6 +183,10 @@ const imageRes = await axios.post(
 );
 
 const buffer = Buffer.from(imageRes.data);
+
+// Charge only after generation succeeds, but before uploading the generated asset.
+// An insufficient-credit request must not create an S3 object.
+await deductCredits(state.userId, "vision");
 
 const filename = `image-${randomUUID()}.jpg`
 
