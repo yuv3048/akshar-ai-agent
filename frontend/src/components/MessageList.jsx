@@ -1,7 +1,10 @@
 import { Code2, FileText, Globe2, ImageIcon, Presentation, Sparkles } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import MessageBubble from "./MessageBubble";
+import getMessages from "../features/getMessages";
+import { useDispatch } from "react-redux";
+import { prependMessages, setMessagePagination, setLoadingOlderMessages } from "../redux/messageSlice";
 
 const loadingMessages = [
   "Hmm, let me think this through…",
@@ -51,22 +54,75 @@ function getRandomSuggestions(previous = []) {
 
 function MessageList({ onSuggestionSelect, isGenerating = false }) {
   const { selectedConversation } = useSelector((state) => state.conversation);
-  const { messages } = useSelector((state) => state.message);
+  const { messages, messagesCursor, hasMoreMessages, loadingOlderMessages } = useSelector((state) => state.message);
+  const dispatch = useDispatch();
   const isEmpty = !selectedConversation || messages.length === 0;
   const [visibleSuggestions, setVisibleSuggestions] = useState(() => getRandomSuggestions());
   const [isHoveringSuggestions, setIsHoveringSuggestions] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState(() => loadingMessages[Math.floor(Math.random() * loadingMessages.length)]);
   const messageAreaRef = useRef(null);
+  const pendingPrependRef = useRef(null);
+  const previousCountRef = useRef(0);
+  const previousConversationRef = useRef(null);
+  const followBottomRef = useRef(true);
+  const loadingOlderRef = useRef(false);
 
-  useEffect(() => {
-    const messageArea = messageAreaRef.current;
-    if (!messageArea) return;
+  const loadOlderMessages = useCallback(async () => {
+    const conversationId = selectedConversation?._id;
+    const area = messageAreaRef.current;
+    if (!conversationId || !area || !hasMoreMessages || !messagesCursor || loadingOlderRef.current) return;
 
-    messageArea.scrollTo({
-      top: messageArea.scrollHeight,
-      behavior: "smooth",
-    });
-  }, [messages.length, isGenerating]);
+    loadingOlderRef.current = true;
+    dispatch(setLoadingOlderMessages(true));
+    pendingPrependRef.current = { scrollHeight: area.scrollHeight, scrollTop: area.scrollTop };
+
+    try {
+      const page = await getMessages(conversationId, { cursor: messagesCursor, limit: 20 });
+      if (selectedConversation?._id !== conversationId) {
+        pendingPrependRef.current = null;
+        return;
+      }
+      dispatch(prependMessages(Array.isArray(page?.items) ? page.items : []));
+      dispatch(setMessagePagination(page));
+      if (!page?.items?.length) pendingPrependRef.current = null;
+    } catch (error) {
+      pendingPrependRef.current = null;
+      console.error("Failed to load older messages:", error.response?.data || error.message);
+    } finally {
+      loadingOlderRef.current = false;
+      dispatch(setLoadingOlderMessages(false));
+    }
+  }, [selectedConversation?._id, hasMoreMessages, messagesCursor, dispatch]);
+
+  useLayoutEffect(() => {
+    const area = messageAreaRef.current;
+    if (!area) return;
+
+    if (pendingPrependRef.current) {
+      const previous = pendingPrependRef.current;
+      area.scrollTop = previous.scrollTop + (area.scrollHeight - previous.scrollHeight);
+      pendingPrependRef.current = null;
+    } else {
+      const conversationChanged = previousConversationRef.current !== selectedConversation?._id;
+      const addedMessage = messages.length > previousCountRef.current;
+      const newestMessage = messages[messages.length - 1];
+      const shouldFollow = conversationChanged ||
+        (addedMessage && (newestMessage?.role === "user" || followBottomRef.current)) ||
+        (!addedMessage && followBottomRef.current && isGenerating);
+      if (shouldFollow) area.scrollTop = area.scrollHeight;
+    }
+
+    previousConversationRef.current = selectedConversation?._id;
+    previousCountRef.current = messages.length;
+  }, [messages, isGenerating, selectedConversation?._id]);
+
+  const handleScroll = useCallback(() => {
+    const area = messageAreaRef.current;
+    if (!area) return;
+    const distanceFromBottom = area.scrollHeight - area.clientHeight - area.scrollTop;
+    followBottomRef.current = distanceFromBottom < 100;
+    if (area.scrollTop < 80 && hasMoreMessages && !loadingOlderRef.current) loadOlderMessages();
+  }, [hasMoreMessages, loadOlderMessages]);
 
   useEffect(() => {
     if (!isGenerating) return;
@@ -95,7 +151,7 @@ function MessageList({ onSuggestionSelect, isGenerating = false }) {
   }, [isHoveringSuggestions]);
 
   return (
-    <div ref={messageAreaRef} className="min-h-0 flex-1 overflow-y-auto px-3 sm:px-6 sm:py-8 [scrollbar-width:thin] [scrollbar-color:#27272a_transparent]">
+    <div ref={messageAreaRef} onScroll={handleScroll} className="min-h-0 flex-1 overflow-y-auto px-3 sm:px-6 sm:py-8 [scrollbar-width:thin] [scrollbar-color:#27272a_transparent]">
       {isEmpty ? (
         <div className="mx-auto flex min-h-full w-full max-w-4xl flex-col items-center justify-center py-8 text-center">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/[0.06] px-3 py-1.5 font-vt323 text-[11px] font-normal tracking-widest text-orange-300">
@@ -133,6 +189,7 @@ function MessageList({ onSuggestionSelect, isGenerating = false }) {
         </div>
       ) : (
         <div className="mx-auto w-full max-w-5xl space-y-6 pb-4">
+          {loadingOlderMessages && <div className="py-2 text-center text-xs text-slate-500" role="status">Loading earlier messages…</div>}
           {messages.map((msg, i) => (
             <div key={msg._id ?? i}>
               <MessageBubble
