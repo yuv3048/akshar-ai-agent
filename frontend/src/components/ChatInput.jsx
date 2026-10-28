@@ -100,15 +100,11 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
         throw new Error("Akshar AI did not return a response. Please try again.");
       }
 
-      setSelectedFile(null);
       if (data.title && data.title !== "New Chat") {
         dispatch(setConvTitle({ conversationId: conversation._id, title: data.title }));
       }
 
       dispatch(setArtifacts(data.artifacts ?? []));
-      const currentUser = await getCurrentUser();
-      if (currentUser) dispatch(setUserdata(currentUser));
-
       dispatch(addMessage({
         role: "assistant",
         content: data.answer,
@@ -116,7 +112,17 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
         images: data.images ?? [],
         artifacts: data.artifacts ?? [],
       }));
+      setSelectedFile(null);
+
+      // A profile refresh failure must not hide a response that already succeeded.
+      try {
+        const currentUser = await getCurrentUser();
+        if (currentUser) dispatch(setUserdata(currentUser));
+      } catch (refreshError) {
+        console.warn("Could not refresh account credits:", refreshError.message);
+      }
     } catch (error) {
+      setValue((previous) => previous || prompt);
       console.error("Failed to send message:", error.response?.data || error.message || error);
       setErrorMessage(
         error.response?.data?.message ||
