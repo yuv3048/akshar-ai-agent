@@ -436,7 +436,7 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
                 disabled={sending || !speechSupported}
                 onClick={toggleMic}
                 className={`ml-1 flex cursor-pointer items-center gap-1.5 bg-transparent px-1 text-xs disabled:cursor-not-allowed disabled:opacity-40 ${
-                  listening ? "text-green-500" : "text-red-500"
+                  listening ? "text-orange-600" : "text-slate-500"
                 }`}
               >
                 {listening ? <AudioLines size={18} /> : <MicOff size={18} />}
