@@ -43,6 +43,7 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
     try {
       const conversation = await createConversation();
       dispatch(addConversation(conversation));
+      window.localStorage.setItem("akshar:selectedConversationId", conversation._id);
       dispatch(setMessages([]));
       dispatch(setArtifacts([]));
       dispatch(setSelectedConversation(conversation));
@@ -66,7 +67,26 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
         const data = await getConversations();
 
         if (!cancelled) {
-          dispatch(setConversations(data ?? []));
+          const conversationList = Array.isArray(data) ? data : [];
+          dispatch(setConversations(conversationList));
+
+          // Redux resets on a full page reload. Restore the last selected chat,
+          // falling back to the most recently updated conversation.
+          const savedConversationId = window.localStorage.getItem("akshar:selectedConversationId");
+          const conversationToRestore =
+            conversationList.find((conversation) => conversation._id === savedConversationId) ??
+            conversationList[0] ??
+            null;
+
+          if (conversationToRestore) {
+            dispatch(setSelectedConversation(conversationToRestore));
+            window.localStorage.setItem("akshar:selectedConversationId", conversationToRestore._id);
+          } else {
+            dispatch(setSelectedConversation(null));
+            dispatch(setMessages([]));
+            dispatch(setArtifacts([]));
+            window.localStorage.removeItem("akshar:selectedConversationId");
+          }
         }
       } catch (error) {
         if (!cancelled) {
@@ -194,7 +214,7 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
                         ? "bg-orange-500/10 border-red-500/18 rounded-r-lg border-l-2 border-l-orange-600"
                         : "bg-transparent border-transparent"
                     }`}
-                onClick={() => { dispatch(setMessages([])); dispatch(setArtifacts([])); dispatch(setSelectedConversation(conv)); onMobileClose?.(); }}
+                onClick={() => { window.localStorage.setItem("akshar:selectedConversationId", conv._id); dispatch(setMessages([])); dispatch(setArtifacts([])); dispatch(setSelectedConversation(conv)); onMobileClose?.(); }}
               >
                 <div
                   className={`flex items-center justify-center shrink-0 w-7 h-7
@@ -256,6 +276,11 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
                         "
                   onClick={() => {
                     logOut();
+                    window.localStorage.removeItem("akshar:selectedConversationId");
+                    dispatch(setConversations([]));
+                    dispatch(setSelectedConversation(null));
+                    dispatch(setMessages([]));
+                    dispatch(setArtifacts([]));
                     dispatch(setUserdata(null));
                   }}
                 >
