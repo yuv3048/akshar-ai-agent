@@ -144,6 +144,7 @@ export const getMessages = async (req, res) => {
     const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 20, 1), 100);
     const { beforeCreatedAt, beforeId } = req.query;
     const filter = { conversationId };
+    const totalCount = await Message.countDocuments({ conversationId });
 
     if (beforeCreatedAt && beforeId) {
       const cursorDate = new Date(beforeCreatedAt);
@@ -166,6 +167,7 @@ export const getMessages = async (req, res) => {
 
     return res.status(200).json({
       items: page.reverse(),
+      totalCount,
       hasMore,
       nextCursor: hasMore && oldest
         ? { createdAt: oldest.createdAt, id: oldest._id }
