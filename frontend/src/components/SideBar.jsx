@@ -9,13 +9,17 @@ import {
   Slash,
 
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import api from "../../utils/axios";
 import { getConversations } from "../features/getConversations";
 import { createConversation } from "../features/createConversation.js";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addConversation,
   setConversations,
+  appendConversations,
+  setConversationPagination,
+  setLoadingMoreConversations,
   setSelectedConversation,
 } from "../redux/conversationSlice";
 import logOut from "../features/logOut.js";
@@ -27,11 +31,12 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
   const [collapsed, setCollapsed] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [creatingConversation, setCreatingConversation] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [showBilling, setShowBilling] = useState(false)
 
   const dispatch = useDispatch();
 
-  const { conversations, selectedConversation } = useSelector(
+  const { conversations, selectedConversation, conversationsCursor, hasMoreConversations } = useSelector(
     (state) => state.conversation,
   );
   const { userData } = useSelector((state) => state.user);
@@ -55,53 +60,70 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
   };
 
   useEffect(() => {
-  let cancelled = false;
+    let cancelled = false;
 
-  const getConv = async () => {
+    const loadInitialConversations = async () => {
       if (!userData) {
         dispatch(setConversations([]));
+        dispatch(setConversationPagination({ hasMore: false, nextCursor: null }));
         return;
       }
 
       try {
-        const data = await getConversations();
+        const page = await getConversations({ limit: 4 });
+        if (cancelled) return;
 
-        if (!cancelled) {
-          const conversationList = Array.isArray(data) ? data : [];
-          dispatch(setConversations(conversationList));
+        const items = Array.isArray(page?.items) ? page.items : [];
+        dispatch(setConversations(items));
+        dispatch(setConversationPagination(page));
 
-          // Redux resets on a full page reload. Restore the last selected chat,
-          // falling back to the most recently updated conversation.
-          const savedConversationId = window.localStorage.getItem("akshar:selectedConversationId");
-          const conversationToRestore =
-            conversationList.find((conversation) => conversation._id === savedConversationId) ??
-            conversationList[0] ??
-            null;
+        const savedId = window.localStorage.getItem("akshar:selectedConversationId");
+        let restore = items.find((item) => item._id === savedId) ?? null;
 
-          if (conversationToRestore) {
-            dispatch(setSelectedConversation(conversationToRestore));
-            window.localStorage.setItem("akshar:selectedConversationId", conversationToRestore._id);
-          } else {
-            dispatch(setSelectedConversation(null));
-            dispatch(setMessages([]));
-            dispatch(setArtifacts([]));
+        // The saved conversation may be older than the first four sidebar items.
+        if (savedId && !restore) {
+          try {
+            const response = await api.get(`/api/chat/get-conversation/${savedId}`);
+            if (!cancelled) restore = response.data;
+          } catch {
             window.localStorage.removeItem("akshar:selectedConversationId");
           }
         }
-      } catch (error) {
-        if (!cancelled) {
-          console.error("Failed to fetch conversations:", error);
+
+        if (cancelled) return;
+        const target = restore ?? items[0] ?? null;
+        dispatch(setSelectedConversation(target));
+        if (target?._id) {
+          window.localStorage.setItem("akshar:selectedConversationId", target._id);
+        } else {
+          dispatch(setMessages([]));
+          dispatch(setArtifacts([]));
+          window.localStorage.removeItem("akshar:selectedConversationId");
         }
+      } catch (error) {
+        if (!cancelled) console.error("Failed to fetch conversations:", error);
       }
     };
 
-    getConv();
-
-    return () => {
-      cancelled = true;
-    };
+    loadInitialConversations();
+    return () => { cancelled = true; };
   }, [userData?._id, dispatch]);
 
+  const handleLoadMoreConversations = useCallback(async () => {
+    if (loadingMore || !hasMoreConversations) return;
+    setLoadingMore(true);
+    dispatch(setLoadingMoreConversations(true));
+    try {
+      const page = await getConversations({ cursor: conversationsCursor, limit: 4 });
+      dispatch(appendConversations(Array.isArray(page?.items) ? page.items : []));
+      dispatch(setConversationPagination(page));
+    } catch (error) {
+      console.error("Failed to load more conversations:", error.response?.data || error.message);
+    } finally {
+      setLoadingMore(false);
+      dispatch(setLoadingMoreConversations(false));
+    }
+  }, [loadingMore, hasMoreConversations, conversationsCursor, dispatch]);
   
 
   return (
@@ -236,6 +258,17 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
               </div>
             );
           })}
+
+          {hasMoreConversations && (
+            <button
+              type="button"
+              onClick={handleLoadMoreConversations}
+              disabled={loadingMore}
+              className="w-full rounded-lg px-3 py-2 text-left text-xs font-medium text-orange-400 transition hover:bg-white/[0.04] hover:text-orange-300 disabled:cursor-wait disabled:opacity-60"
+            >
+              {loadingMore ? "Loading..." : "See more"}
+            </button>
+          )}
         </div>
 
         <div className="mx-2.5 h-px shrink-0 bg-white/[0.06]" />
