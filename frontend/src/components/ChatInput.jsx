@@ -410,7 +410,7 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
               }
             }}
             value={value}
-            disabled={sending}
+            disabled={sending || insufficientCredits}
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
