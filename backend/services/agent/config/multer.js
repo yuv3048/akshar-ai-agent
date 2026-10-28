@@ -1,35 +1,32 @@
-import fs from "fs"
-import path from "path"
-import multer from "multer"
+import fs from "node:fs";
+import path from "node:path";
+import { randomUUID } from "node:crypto";
+import multer from "multer";
 
 const uploadDir = path.resolve("./temp");
-
-if(!fs.existsSync(uploadDir)){
-    fs.mkdirSync(uploadDir, {recursive: true})
-}
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 const storage = multer.diskStorage({
-    destination(req, file, cb){
-        cb(null, uploadDir)
-    },
-    filename(req, file, cb){
-        cb(null, `${Date.now}-${file.originalname}`)
-    }
-})
+  destination(_req, _file, callback) {
+    callback(null, uploadDir);
+  },
+  filename(_req, file, callback) {
+    const extension = path.extname(file.originalname).toLowerCase().slice(0, 12);
+    callback(null, `${randomUUID()}${extension}`);
+  },
+});
 
-const fileFilter = (req, file, cb)=>{
+const fileFilter = (_req, file, callback) => {
+  const isPdf = file.mimetype === "application/pdf";
+  const isImage = file.mimetype.startsWith("image/");
+  if (isPdf || isImage) return callback(null, true);
+  return callback(new multer.MulterError("LIMIT_UNEXPECTED_FILE", "file"));
+};
 
-    if(file.mimetype == "application/pdf" || 
-        file.mimetype.startsWith("image/")
-    ){
-        cb(null, true)
-    }else{
-        cb(new Error("Only PDF and Images are allowed"))
-    }
-}
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 20 * 1024 * 1024, files: 1 },
+});
 
-export default multer({
-    storage,fileFilter, limits:{
-        fileSize: 20 * 1024 * 1024
-    }
-})
+export default upload;
