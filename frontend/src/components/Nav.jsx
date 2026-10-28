@@ -1,39 +1,43 @@
-import { useSelector } from "react-redux"
-import { PanelLeft } from "lucide-react"
+import { useSelector } from "react-redux";
+import { PanelLeft, MessageSquare } from "lucide-react";
 
 function Nav({ onOpenSidebar }) {
-  const { selectedConversation } = useSelector(state => state.conversation)
-  const { messages } = useSelector(state => state.message)
-
+  const { selectedConversation } = useSelector((state) => state.conversation);
+  const { messages } = useSelector((state) => state.message);
 
   return (
-    <div className="h-14 flex items-center px-3 sm:px-5 border-b gap-2.5 border-white/[0.06] bg-[#000000] shrink-0">
+    <header className="z-10 flex h-[62px] shrink-0 items-center gap-3 border-b border-white/[0.07] bg-[#050505]/95 px-3 backdrop-blur-xl sm:px-5">
       <button
         type="button"
         aria-label="Open sidebar"
         title="Open sidebar"
         onClick={onOpenSidebar}
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.03] text-slate-400 transition-colors hover:border-orange-500/25 hover:bg-orange-500/10 hover:text-orange-300 lg:hidden"
+        className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-slate-400 transition hover:border-orange-500/30 hover:bg-orange-500/[0.08] hover:text-orange-300 lg:hidden"
       >
         <PanelLeft size={18} />
       </button>
 
-
-      <span className="flex items-center font-space font-bold text-sm tracking-wide text-slate-400 min-w-0 flex-1 truncate">
-        <img
-              src="./akshar-logo.svg"
-              alt="Akshar AI"
-              className="w-8 h-8 scale-150"
-        />
-         : {selectedConversation?.title || "Akshar AI"}
-      </span>
-
-      <div className="text-[11px] font-inter font-medium text-slate-500 bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 rounded-full tracking-tight whitespace-nowrap shrink-0">
-        {messages?.length ?? 0} Messages
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-orange-500/20 bg-gradient-to-br from-orange-500/10 to-red-600/10">
+          <img src="./akshar-logo.svg" alt="" className="h-7 w-7 object-contain" />
+        </div>
+        <div className="min-w-0">
+          <p className="truncate font-space text-[13px] font-semibold tracking-wide text-slate-100 sm:text-sm">
+            {selectedConversation?.title || "Akshar AI"}
+          </p>
+          <p className="mt-0.5 text-[10px] tracking-wide text-slate-500">
+            YOUR AI WORKSPACE
+          </p>
+        </div>
       </div>
 
-    </div>
-  )
+      <div className="flex shrink-0 items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1.5 text-[10px] font-medium text-slate-400 sm:px-3 sm:text-[11px]">
+        <MessageSquare size={13} className="text-orange-400" />
+        <span>{messages?.length ?? 0}</span>
+        <span className="hidden sm:inline">messages</span>
+      </div>
+    </header>
+  );
 }
 
-export default Nav
+export default Nav;
