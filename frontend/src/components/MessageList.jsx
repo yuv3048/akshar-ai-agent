@@ -95,22 +95,22 @@ function MessageList({ onSuggestionSelect, isGenerating = false }) {
   }, [isHoveringSuggestions]);
 
   return (
-    <div ref={messageAreaRef} className="min-h-0 flex-1 overflow-y-auto px-3 sm:px-6 sm:py-8 [scrollbar-width:thin] [scrollbar-color:#27272a_transparent]">
+    <div ref={messageAreaRef} className="min-h-0 flex-1 overflow-y-auto bg-[radial-gradient(ellipse_at_50%_0%,rgba(234,88,12,0.055),transparent_55%)] px-3 sm:px-6 sm:py-8 [scrollbar-width:thin] [scrollbar-color:#27272a_transparent]">
       {isEmpty ? (
         <div className="mx-auto flex min-h-full w-full max-w-4xl flex-col items-center justify-center py-8 text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/[0.06] px-3 py-1.5 font-vt323 text-[11px] font-normal tracking-widest text-orange-300">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/[0.06] px-3.5 py-2 font-inter text-[10px] font-semibold tracking-[0.18em] text-orange-300">
             <Sparkles size={13} />
             YOUR AI WORKSPACE
           </div>
-          <h1 className="flex flex-col font-doto text-5xl font-extrabold tracking-wide text-white sm:text-7xl">
+          <h1 className="flex flex-col font-space text-5xl font-bold tracking-[-0.055em] text-white sm:text-7xl">
             Think it <span className="bg-linear-to-r from-orange-400 to-red-500 bg-clip-text text-transparent">Build it</span>
           </h1>
-          <p className="mt-4 max-w-lg font-space text-sm leading-6 text-slate-400 sm:text-base">
+          <p className="mt-4 max-w-lg font-inter text-sm leading-7 text-slate-400 sm:text-base">
             Welcome to Akshar AI. Research ideas, solve problems, write code, or create something new.
           </p>
 
           <div
-            className="mt-9 flex w-full max-w-full flex-nowrap gap-3 text-left"
+            className="mt-9 flex w-full max-w-full flex-nowrap gap-3 text-left sm:gap-4"
             onMouseEnter={() => setIsHoveringSuggestions(true)}
             onMouseLeave={() => setIsHoveringSuggestions(false)}
           >
@@ -119,13 +119,13 @@ function MessageList({ onSuggestionSelect, isGenerating = false }) {
                 type="button"
                 key={label}
                 onClick={() => onSuggestionSelect?.({ prompt, agent })}
-                className={`group min-w-0 flex-1 rounded-4xl border border-orange-600/20 p-5 p-4 text-left transition-all duration-300 hover:-translate-y-0.5 cursor-pointer  ${index === 2 ? "hidden sm:block" : ""}`}
+                className={`group min-w-0 flex-1 cursor-pointer rounded-2xl border border-white/[0.08] bg-[#0a0a0c]/90 p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-500/30 hover:bg-[#101012] sm:p-5 ${index === 2 ? "hidden sm:block" : ""}`}
               >
-                <span className="mb-5 flex h-9 w-9 items-center justify-center rounded-xl text-orange-300 border border-white/[0.08] bg-white/[0.04] transition-colors group-hover:border-orange-500/20 group-hover:bg-orange-500/10 group-hover:text-orange-300">
+                <span className="mb-5 flex h-10 w-10 items-center justify-center rounded-xl border border-orange-500/15 bg-orange-500/[0.06] text-orange-300 transition-colors group-hover:border-orange-500/30 group-hover:bg-orange-500/10">
                   <Icon size={17} />
                 </span>
-                <span className="block text-sm font-medium text-slate-200">{label}</span>
-                <span className="mt-1.5 block text-xs leading-5 text-slate-500">{detail}</span>
+                <span className="block text-[13px] font-semibold text-slate-100 sm:text-sm">{label}</span>
+                <span className="mt-2 block text-xs leading-5 text-slate-500">{detail}</span>
               </button>
             ))}
           </div>
