@@ -299,9 +299,9 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
   ];
 
   return (
-    <div className="w-full shrink-0 bg-[#000000] px-3 pb-4 pt-2 sm:px-5">
+    <div className="w-full shrink-0 bg-gradient-to-t from-[#050505] via-[#050505] to-transparent px-3 pb-4 pt-3 sm:px-5">
       <div className="mx-auto w-full max-w-4xl">
-        <div className="group flex flex-col gap-3 rounded-2xl border border-white/[0.10] bg-[#0D0F14] px-3 pb-3 pt-3 shadow-[0_12px_45px_rgba(0,0,0,0.28)] transition-colors focus-within:border-orange-500/35 sm:px-4">
+        <div className="group flex flex-col gap-3 rounded-2xl border border-white/[0.10] bg-[#0b0c0f] px-3 pb-3 pt-3 shadow-[0_16px_50px_rgba(0,0,0,0.35)] transition-colors focus-within:border-orange-500/35 sm:px-4">
           <div className="flex w-full gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {agents.map((agent) => {
               const isActive = selectedAgent === agent.label;
@@ -312,9 +312,9 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
                   key={agent.id}
                   disabled={sending}
                   onClick={() => setSelectedAgent(agent.label)}
-                  className={`inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-xl border px-3 py-2 font-inter text-xs font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
+                  className={`inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-2 font-inter text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                     isActive
-                      ? "border-transparent bg-linear-to-r from-orange-700 to-red-600 text-white shadow-[0_1px_8px_rgba(234,70,35,0.25)]"
+                      ? "border-orange-500/25 bg-orange-500/10 text-orange-200"
                       : "border-white/[0.06] bg-white/[0.03] text-slate-400 hover:bg-white/[0.07] hover:text-slate-200"
                   }`}
                 >
@@ -388,7 +388,7 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
                 handleSendMessage();
               }
             }}
-            className="w-full resize-none bg-transparent text-[14px] leading-relaxed text-slate-200 outline-none placeholder:text-slate-600 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden disabled:opacity-50"
+            className="w-full resize-none bg-transparent px-1 py-1 text-[14px] leading-7 text-slate-100 outline-none placeholder:text-slate-600 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden disabled:opacity-50"
             rows={2}
           />
 
