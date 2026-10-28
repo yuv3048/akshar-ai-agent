@@ -8,26 +8,23 @@ const CHAT_RATE_LIMIT = 20;
 const CHAT_RATE_WINDOW_SECONDS = 60;
 
 const generateConversationTitle = async (prompt) => {
-  const fallbackTitle = prompt.trim().replace(/\\s+/g, " ").slice(0, 40) || "New Chat";
+  // Build titles directly from the user's first prompt. The title LLM was
+  // occasionally returning words with spaces inserted inside them.
+  const cleaned = String(prompt ?? "")
+    .replace(/(?:https?:\/\/|www\.)\S+/gi, "")
+    .replace(/[\r\n\t]+/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/^[\s"'#>*-]+|[\s"'#]+$/g, "")
+    .trim();
 
-  try {
-    const llm = await getModel("chat");
-    const response = await llm.invoke([
-      ["system", "Create a concise, meaningful conversation title based only on the user's first message. Return only 2 to 4 words, no quotes, no markdown, maximum 40 characters."],
-      ["human", prompt.slice(0, 4000)],
-    ]);
-    const title = (typeof response.content === "string" ? response.content : "")
-      .replace(/^["'\\s]+|["'\\s]+$/g, "")
-      .replace(/^#+\\s*/, "")
-      .replace(/[\\r\\n]+/g, " ")
-      .trim()
-      .slice(0, 60);
+  if (!cleaned) return "New Chat";
 
-    return title || fallbackTitle;
-  } catch (error) {
-    console.error("LLM title generation failed; using prompt fallback:", error.message);
-    return fallbackTitle;
-  }
+  const words = cleaned.split(" ").filter(Boolean);
+  let title = words.slice(0, 6).join(" ");
+  if (title.length > 48) title = title.slice(0, 48).replace(/\s+\S*$/, "").trim();
+  if (!title) title = cleaned.slice(0, 48).trim();
+
+  return title ? title.charAt(0).toLocaleUpperCase() + title.slice(1) : "New Chat";
 };
 
 export const agent = async (req, res) => {
