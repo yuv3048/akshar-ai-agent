@@ -89,6 +89,7 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
 
       if (!conversation?._id) {
         conversation = await createConversation();
+        window.localStorage.setItem("akshar:selectedConversationId", conversation._id);
         dispatch(addConversation(conversation));
         dispatch(setSelectedConversation(conversation));
         dispatch(setMessages([]));
