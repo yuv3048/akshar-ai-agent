@@ -4,21 +4,26 @@ import {
   Globe2,
   ImageIcon,
   MessageSquare,
-  MicAudioLines,
+  Mic,
   Paperclip,
   Presentation,
   Send,
+  Square,
   X,
   Zap,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import sendMessage from "../features/sendMessage.js";
 import getCurrentUser from "../features/getCurrentUser.js";
 import { setUserdata } from "../redux/userSlice.js";
 import { useDispatch, useSelector } from "react-redux";
 import { addMessage, setArtifacts, setMessages } from "../redux/messageSlice";
 import { createConversation } from "../features/createConversation.js";
-import { addConversation, setConvTitle, setSelectedConversation } from "../redux/conversationSlice.js";
+import {
+  addConversation,
+  setConvTitle,
+  setSelectedConversation,
+} from "../redux/conversationSlice.js";
 
 const MAX_FILE_SIZE = 20 * 1024 * 1024;
 
@@ -30,9 +35,11 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
   const [errorMessage, setErrorMessage] = useState("");
   const { selectedConversation } = useSelector((state) => state.conversation);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [listening, setListening] = useState(null);
+  const [listening, setListening] = useState(false);
+  const [speechSupported, setSpeechSupported] = useState(true);
   const recognitionRef = useRef(null);
-
+  const listeningRef = useRef(false);
+  const speechBaseValueRef = useRef("");
   const fileRef = useRef(null);
   const dispatch = useDispatch();
 
@@ -41,7 +48,8 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
     event.target.value = "";
     if (!file) return;
 
-    const supported = file.type === "application/pdf" || file.type.startsWith("image/");
+    const supported =
+      file.type === "application/pdf" || file.type.startsWith("image/");
     if (!supported) {
       setErrorMessage("Choose a PDF or an image file.");
       return;
@@ -59,12 +67,18 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
     const prompt = (promptOverride ?? value).trim();
     if ((!prompt && !selectedFile) || sending) return;
 
+    if (listeningRef.current) {
+      recognitionRef.current?.stop();
+      listeningRef.current = false;
+      setListening(false);
+    }
+
     const attachedFile = selectedFile;
-    const finalPrompt = prompt || (
-      attachedFile?.type === "application/pdf"
+    const finalPrompt =
+      prompt ||
+      (attachedFile?.type === "application/pdf"
         ? "Summarize this PDF and identify its key points."
-        : "Describe this image and analyze its important details."
-    );
+        : "Describe this image and analyze its important details.");
 
     setSending(true);
     onSendingChange?.(true);
@@ -84,11 +98,13 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
       const visiblePrompt = attachedFile
         ? `${finalPrompt}\n\n_Attached: ${attachedFile.name}_`
         : finalPrompt;
-      dispatch(addMessage({
-        role: "user",
-        content: visiblePrompt,
-        conversationId: conversation._id,
-      }));
+      dispatch(
+        addMessage({
+          role: "user",
+          content: visiblePrompt,
+          conversationId: conversation._id,
+        }),
+      );
       setValue("");
 
       const data = await sendMessage({
@@ -104,17 +120,24 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
       }
 
       if (data.title && data.title !== "New Chat") {
-        dispatch(setConvTitle({ conversationId: conversation._id, title: data.title }));
+        dispatch(
+          setConvTitle({
+            conversationId: conversation._id,
+            title: data.title,
+          }),
+        );
       }
 
       dispatch(setArtifacts(data.artifacts ?? []));
-      dispatch(addMessage({
-        role: "assistant",
-        content: data.answer,
-        conversationId: conversation._id,
-        images: data.images ?? [],
-        artifacts: data.artifacts ?? [],
-      }));
+      dispatch(
+        addMessage({
+          role: "assistant",
+          content: data.answer,
+          conversationId: conversation._id,
+          images: data.images ?? [],
+          artifacts: data.artifacts ?? [],
+        }),
+      );
       setSelectedFile(null);
 
       // A profile refresh failure must not hide a response that already succeeded.
@@ -126,11 +149,14 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
       }
     } catch (error) {
       setValue((previous) => previous || prompt);
-      console.error("Failed to send message:", error.response?.data || error.message || error);
+      console.error(
+        "Failed to send message:",
+        error.response?.data || error.message || error,
+      );
       setErrorMessage(
         error.response?.data?.message ||
-        error.message ||
-        "Message failed to send. Please try again."
+          error.message ||
+          "Message failed to send. Please try again.",
       );
     } finally {
       setSending(false);
@@ -138,50 +164,112 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
     }
   };
 
-  const toggleMic=()=>{
-    if(!recognitionRef.current) {
-      alert("speech recognition not supported")
-    
-    if(listening){
-      recognitionRef.current.stop()
-      setListening(false)
-    }else{
-      recognitionRef.current.start()
-      setListening(true)
-    }
-  }
-
   useEffect(() => {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-    if(!SpeechRecognition)return;
+    if (!SpeechRecognition) {
+      setSpeechSupported(false);
+      return undefined;
+    }
 
-    const recognition=new SpeechRecognition()
-    recognition. lang="en-US"
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
     recognition.interimResults = true;
     recognition.continuous = true;
+    recognition.maxAlternatives = 1;
 
-    recognition.onresults=(event)=>{
-    console. log(event)
+    recognition.onstart = () => {
+      listeningRef.current = true;
+      setListening(true);
+      setErrorMessage("");
+    };
+
+    recognition.onresult = (event) => {
+      let finalTranscript = "";
+      let interimTranscript = "";
+
+      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        const result = event.results[index];
+        const transcript = result[0]?.transcript ?? "";
+        if (result.isFinal) {
+          finalTranscript += transcript;
+        } else {
+          interimTranscript += transcript;
+        }
+      }
+
+      if (finalTranscript) {
+        speechBaseValueRef.current = `${speechBaseValueRef.current}${speechBaseValueRef.current ? " " : ""}${finalTranscript}`.trim();
+      }
+
+      const combined = [speechBaseValueRef.current, interimTranscript]
+        .filter(Boolean)
+        .join(" ")
+        .trim();
+      setValue(combined);
+    };
+
+    recognition.onerror = (event) => {
+      if (event.error === "aborted" || event.error === "no-speech") return;
+
+      const messages = {
+        "not-allowed": "Microphone access is blocked. Allow microphone access in your browser settings.",
+        "service-not-allowed": "Speech recognition is blocked by your browser.",
+        "audio-capture": "No microphone was found. Check your microphone connection.",
+        network: "Speech recognition needs a working network connection.",
+      };
+      setErrorMessage(
+        messages[event.error] || "Voice input stopped. Please try again.",
+      );
+    };
+
+    recognition.onend = () => {
+      listeningRef.current = false;
+      setListening(false);
+    };
+
+    recognitionRef.current = recognition;
+
+    return () => {
+      listeningRef.current = false;
+      recognition.onresult = null;
+      recognition.onstart = null;
+      recognition.onerror = null;
+      recognition.onend = null;
+      recognition.abort();
+      recognitionRef.current = null;
+    };
+  }, []);
+
+  const toggleMic = useCallback(() => {
+    const recognition = recognitionRef.current;
+
+    if (!speechSupported || !recognition) {
+      setErrorMessage(
+        "Voice input isn't supported in this browser. Try the latest Chrome or Edge.",
+      );
+      return;
     }
 
-    recognitionRef.current=recognition
+    if (listeningRef.current) {
+      recognition.stop();
+      listeningRef.current = false;
+      setListening(false);
+      return;
+    }
 
-    recognition.onresult=(event)=>{
+    // Keep text already typed in the composer and append dictated words.
+    speechBaseValueRef.current = value.trim();
+    try {
+      recognition.start();
+    } catch (error) {
+      console.warn("Could not start speech recognition:", error);
+      setErrorMessage("Couldn't start the microphone. Please try again.");
+    }
+  }, [speechSupported, value]);
 
-    let transcript = ""
-
-  for (let index = event.resultIndex; index < event.results.length; index++) {
-
-      transcript+=event.results[index][0].transcript
-  }
-
-  setValue(transcript)
-
-  recognition.onend=()=>{
-  setListening(false)
-  }
-
+  useEffect(() => {
     if (!suggestedAction || lastHandledAction.current === suggestedAction) return;
 
     lastHandledAction.current = suggestedAction;
@@ -230,7 +318,10 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
                       : "border-white/[0.06] bg-white/[0.03] text-slate-400 hover:bg-white/[0.07] hover:text-slate-200"
                   }`}
                 >
-                  <Icon size={14} className={isActive ? "text-white" : "text-slate-500"} />
+                  <Icon
+                    size={14}
+                    className={isActive ? "text-white" : "text-slate-500"}
+                  />
                   {agent.label}
                 </button>
               );
@@ -240,12 +331,20 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
           {selectedFile && (
             <div className="flex items-center gap-3 rounded-xl border border-orange-500/20 bg-orange-500/[0.06] px-3 py-2.5">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-500/10 text-orange-300">
-                {selectedFile.type === "application/pdf" ? <FileText size={18} /> : <ImageIcon size={18} />}
+                {selectedFile.type === "application/pdf" ? (
+                  <FileText size={18} />
+                ) : (
+                  <ImageIcon size={18} />
+                )}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-xs font-medium text-slate-200">{selectedFile.name}</p>
+                <p className="truncate text-xs font-medium text-slate-200">
+                  {selectedFile.name}
+                </p>
                 <p className="mt-0.5 text-[10px] text-slate-500">
-                  {selectedFile.type === "application/pdf" ? "PDF · Ready to analyze" : "Image · Ready to analyze"}
+                  {selectedFile.type === "application/pdf"
+                    ? "PDF · Ready to analyze"
+                    : "Image · Ready to analyze"}
                   {" · "}
                   {selectedFile.size < 1024 * 1024
                     ? `${Math.max(1, Math.round(selectedFile.size / 1024))} KB`
@@ -266,8 +365,21 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
           )}
 
           <textarea
-            placeholder={selectedFile?.type === "application/pdf" ? "Ask a question about this PDF..." : selectedFile ? "Ask something about this image..." : "Ask anything..."}
-            onChange={(event) => setValue(event.target.value)}
+            placeholder={
+              selectedFile?.type === "application/pdf"
+                ? "Ask a question about this PDF..."
+                : selectedFile
+                  ? "Ask something about this image..."
+                  : listening
+                    ? "Listening… speak now"
+                    : "Ask anything..."
+            }
+            onChange={(event) => {
+              setValue(event.target.value);
+              if (!listeningRef.current) {
+                speechBaseValueRef.current = event.target.value;
+              }
+            }}
             value={value}
             disabled={sending}
             onKeyDown={(event) => {
@@ -280,10 +392,14 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
             rows={2}
           />
 
-          {errorMessage && <p role="alert" className="px-1 text-xs text-red-400">{errorMessage}</p>}
+          {errorMessage && (
+            <p role="alert" className="px-1 text-xs text-red-400">
+              {errorMessage}
+            </p>
+          )}
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex min-w-0 items-center gap-1">
               <input
                 type="file"
                 accept=".pdf,application/pdf,image/*"
@@ -297,36 +413,68 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
                 title="Attach PDF or image"
                 disabled={sending}
                 onClick={() => fileRef.current?.click()}
-                className="flex h-9 w-45 px-2 cursor-pointer items-center justify-between rounded-xl border border-transparent bg-transparent text-slate-400 transition-all hover:bg-white/[0.06] hover:text-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-9 max-w-[190px] cursor-pointer items-center gap-2 rounded-xl border border-transparent bg-transparent px-2 text-slate-400 transition-all hover:bg-white/[0.06] hover:text-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <Paperclip size={18} /> <span className="text-[10px] text-slate-600">PDF or image · Max 20 MB</span>
+                <Paperclip size={18} className="shrink-0" />
+                <span className="truncate text-[10px] text-slate-500">
+                  PDF or image · Max 20 MB
+                </span>
               </button>
+
               <button
-                onClick={toggleMic}
                 type="button"
-                aria-label="Voice input"
-                title="Voice input"
-                className="ml-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-transparent bg-transparent text-slate-300 transition-all hover:border-white/[0.06] hover:bg-white/[0.05] hover:text-slate-100"
+                aria-label={
+                  listening ? "Stop voice input" : "Start voice input"
+                }
+                title={
+                  !speechSupported
+                    ? "Voice input isn't supported in this browser"
+                    : listening
+                      ? "Stop voice input"
+                      : "Start voice input"
+                }
+                disabled={sending || !speechSupported}
+                onClick={toggleMic}
+                className={`relative ml-1 flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-xl border transition-all disabled:cursor-not-allowed disabled:opacity-40 ${
+                  listening
+                    ? "border-orange-500/50 bg-orange-500/15 text-orange-300 shadow-[0_0_18px_rgba(249,115,22,0.15)]"
+                    : "border-white/[0.07] bg-white/[0.03] text-slate-400 hover:border-white/[0.12] hover:bg-white/[0.07] hover:text-white"
+                }`}
               >
-                <MicAudioLines size={18} />
+                {listening && (
+                  <span className="absolute inset-0 animate-ping rounded-xl border border-orange-400/30" />
+                )}
+                {listening ? <Square size={14} fill="currentColor" /> : <Mic size={18} />}
               </button>
+              {listening && (
+                <span className="hidden whitespace-nowrap text-[10px] font-medium text-orange-300 sm:inline">
+                  Listening
+                </span>
+              )}
             </div>
+
             <button
               type="button"
               disabled={(!value.trim() && !selectedFile) || sending}
               onClick={() => handleSendMessage()}
               aria-label={sending ? "Sending message" : "Send message"}
-              className={`flex h-10 w-10 items-center justify-center rounded-xl border-none transition-all duration-150 ${
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-none transition-all duration-150 ${
                 (value.trim() || selectedFile) && !sending
                   ? "cursor-pointer bg-linear-to-br from-orange-500 to-red-600 text-white shadow-[0_4px_18px_rgba(234,70,35,0.18)] hover:brightness-110"
                   : "cursor-not-allowed bg-white/[0.05] text-slate-600"
               }`}
             >
-              {sending ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" /> : <Send size={19} />}
+              {sending ? (
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+              ) : (
+                <Send size={19} />
+              )}
             </button>
           </div>
         </div>
-        <p className="mt-2 text-center font-inter text-[10px] text-slate-600">Akshar AI can make mistakes. Verify important information.</p>
+        <p className="mt-2 text-center font-inter text-[10px] text-slate-600">
+          Akshar AI can make mistakes. Verify important information.
+        </p>
       </div>
     </div>
   );
