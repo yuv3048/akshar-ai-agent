@@ -133,9 +133,7 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
         );
       }
 
-      if (/not enough credits|out of credits|insufficient credits/i.test(data.answer)) {
-        setCreditBlockedByServer(true);
-      }
+      const creditRejected = /not enough credits|out of credits|insufficient credits/i.test(data.answer);
 
       dispatch(setArtifacts(data.artifacts ?? []));
       dispatch(
@@ -152,7 +150,10 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
       // A profile refresh failure must not hide a response that already succeeded.
       try {
         const currentUser = await getCurrentUser();
-        if (currentUser) dispatch(setUserdata(currentUser));
+        if (currentUser) {
+          dispatch(setUserdata(currentUser));
+          setCreditBlockedByServer(creditRejected && Number(currentUser.credits ?? 0) <= 0);
+        }
       } catch (refreshError) {
         console.warn("Could not refresh account credits:", refreshError.message);
       }
