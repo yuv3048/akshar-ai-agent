@@ -1,67 +1,53 @@
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { getModel } from "../config/llmModel.js";
-import fs from "fs";
+import fs from "node:fs/promises";
 import { deductCredits } from "../utils/deductCredits.js";
 
-export const imageAnalyzer = async (state) =>{
-    try{
-        const llm = await getModel("imageAnalyzer");
-
-        const imageBuffer = fs.readFile(state.file.path);
-
-        const base64image = imageBuffer.toString("base64");
-
-        const messages = [
-            new SystemMessage(`
-You are Akshar AI Vision, an intelligent image-analysis assistant.
-Your job is to understand the uploaded image and deliver accurate, relevant, and helpful answers to the user's questions.
-
-Guidelines:
-- Analyze the image carefully and answer the user's specific question first.
-- Accurately extract visible text, code, numbers, and symbols when relevant.
-- Clearly explain charts, tables, diagrams, screenshots, and error messages when needed.
-- Base every visual claim on evidence from the image. Never invent details or make unsupported assumptions.
-- If something is blurry, unreadable, or ambiguous, acknowledge the uncertainty instead of guessing.
-- Use general knowledge to interpret the image when helpful, but never confuse assumptions with observations.
-- Use clean Markdown formatting when it improves readability.
-- Keep responses concise for simple questions and detailed for complex analysis.
-- Core principle: See clearly. Think carefully. Answer accurately.
-
-    `),
-            new HumanMessage(
-                {
-                    content:[
-                        {
-                            type: "text",
-                            text: state.prompt || "analyze the image"
-                        },
-                        {
-                            type:"image_url",
-                            "image_url": {
-                                url: `data:${state.file.mimetype};base64,${base64image}`
-                            }
-                        }
-                    ]
-                }
-            )
-        ]
-
-        const response = await llm.invoke(messages)
-        await deductCredits(state.userId, "vision")
-
-        return {
-            ...state,
-            aiResponse: response.content
-        }
-
-    }catch(error){
-        console.log(error)
-        return {
-            ...state,
-            aiResponse: "Failed to analyze file."
-        }
+export const imageAnalyzer = async (state) => {
+  const file = state.file;
+  try {
+    if (!file?.path || !file?.mimetype?.startsWith("image/")) {
+      throw new Error("A valid image upload is required");
     }
-    finally{
-        fs.unlink(state.file.path)
+
+    const llm = await getModel("imageAnalyzer");
+    const imageBuffer = await fs.readFile(file.path);
+    const base64image = imageBuffer.toString("base64");
+    const dataUrl = `data:${file.mimetype};base64,${base64image}`;
+
+    const messages = [
+      new SystemMessage(`You are Akshar AI Vision, an image-analysis assistant.
+Answer the user's specific question first. Accurately describe visible text, code, numbers, charts, diagrams, screenshots, and objects when relevant.
+Base claims on visible evidence. Never invent details. If something is blurry or uncertain, say so.
+Use clear Markdown when useful, and be concise unless the user asks for detail.`),
+      new HumanMessage({
+        content: [
+          { type: "text", text: state.prompt || "Analyze this image." },
+          { type: "image_url", image_url: dataUrl },
+        ],
+      }),
+    ];
+
+    const response = await llm.invoke(messages);
+    const answer = typeof response?.content === "string"
+      ? response.content
+      : Array.isArray(response?.content)
+        ? response.content.map((part) => typeof part === "string" ? part : part?.text ?? "").join("")
+        : "";
+
+    if (!answer.trim()) throw new Error("Image model returned an empty answer");
+    await deductCredits(state.userId, "vision");
+    return { ...state, aiResponse: answer.trim() };
+  } catch (error) {
+    console.error("Image analysis error:", error);
+    return { ...state, aiResponse: "I couldn't analyze this image right now. Please try another image or try again shortly." };
+  } finally {
+    if (file?.path) {
+      try {
+        await fs.unlink(file.path);
+      } catch (error) {
+        if (error.code !== "ENOENT") console.warn("Image upload cleanup failed:", error.message);
+      }
     }
-}
+  }
+};
