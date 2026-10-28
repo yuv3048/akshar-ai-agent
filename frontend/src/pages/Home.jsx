@@ -39,17 +39,17 @@ function Home() {
       }
 
   return (
-    <div className='h-[100dvh] flex bg-[#000000] text-white overflow-hidden'>
+    <div className='relative flex h-[100dvh] overflow-hidden bg-[#030303] text-white selection:bg-orange-500/30'>
    
       <SideBar mobileOpen={mobileSidebarOpen} onMobileClose={() => setMobileSidebarOpen(false)} />
       <ChatArea onOpenSidebar={() => setMobileSidebarOpen(true)} />
       <Artifact/>
 
-      {!userData &&  <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm'>
-          <div className='w-[340px] bg-[#13151c] border border-white/[0.08] rounded-2xl p-7 flex flex-col gap-5'>
-              <div className='flex flex-col gap-1'>
-                 <h2 className='text-[17px] font-semibold text-slate-100 tracking-tight'>Welcome to Akshar AI</h2>
-                 <p className='text-[13px] text-slate-500'>Please login to continue using the app.</p>
+      {!userData &&  <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-md'>
+          <div className='relative flex w-full max-w-[390px] flex-col gap-6 overflow-hidden rounded-3xl border border-white/[0.10] bg-[#0c0c0e] p-7 shadow-[0_28px_100px_rgba(0,0,0,0.65)] sm:p-8'>
+              <div className='mb-1 flex flex-col gap-2'>\n                 <div className='mb-1 flex h-12 w-12 items-center justify-center rounded-2xl border border-orange-500/20 bg-gradient-to-br from-orange-500/15 to-red-600/10'>\n                   <img src='./akshar-logo.svg' alt='' className='h-10 w-10 object-contain' />\n                 </div>
+                 <h2 className='font-space text-xl font-semibold tracking-tight text-white'>Welcome to Akshar AI</h2>
+                 <p className='text-sm leading-relaxed text-slate-400'>Please login to continue using the app.</p>
               </div>
 
               <button className='w-full 
