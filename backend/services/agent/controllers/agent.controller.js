@@ -8,23 +8,51 @@ const CHAT_RATE_LIMIT = 20;
 const CHAT_RATE_WINDOW_SECONDS = 60;
 
 const generateConversationTitle = async (prompt) => {
-  // Build titles directly from the user's first prompt. The title LLM was
-  // occasionally returning words with spaces inserted inside them.
-  const cleaned = String(prompt ?? "")
+  const fallbackTitle = String(prompt ?? "")
     .replace(/(?:https?:\/\/|www\.)\S+/gi, "")
     .replace(/[\r\n\t]+/g, " ")
     .replace(/\s+/g, " ")
-    .replace(/^[\s"'#>*-]+|[\s"'#]+$/g, "")
-    .trim();
+    .trim()
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 4)
+    .join(" ") || "New Chat";
 
-  if (!cleaned) return "New Chat";
+  try {
+    const llm = await getModel("chat");
+    const result = await llm.invoke([
+      [
+        "system",
+        "Generate a clear title for this conversation based only on the user's first message. Return exactly 2 to 4 natural words. Preserve normal spelling; never insert spaces inside words. Do not include quotes, punctuation, markdown, explanations, or a prefix. Output only the title."
+      ],
+      ["human", String(prompt ?? "").slice(0, 4000)],
+    ]);
 
-  const words = cleaned.split(" ").filter(Boolean);
-  let title = words.slice(0, 6).join(" ");
-  if (title.length > 48) title = title.slice(0, 48).replace(/\s+\S*$/, "").trim();
-  if (!title) title = cleaned.slice(0, 48).trim();
+    const raw = typeof result?.content === "string"
+      ? result.content
+      : Array.isArray(result?.content)
+        ? result.content.map((part) => typeof part?.text === "string" ? part.text : "").join(" ")
+        : "";
 
-  return title ? title.charAt(0).toLocaleUpperCase() + title.slice(1) : "New Chat";
+    const title = raw
+      .replace(/<think>[\s\S]*?<\/think>/gi, " ")
+      .replace(/^[\s"'#*\-:]+|[\s"'#*\-:]+$/g, "")
+      .replace(/[\r\n\t]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    const words = title.split(" ").filter(Boolean);
+    if (words.length >= 2 && words.length <= 4 && title.length <= 60) {
+      return title;
+    }
+
+    // Keep a deterministic, readable fallback if the model returns malformed
+    // text instead of a 2–4 word title.
+    return fallbackTitle;
+  } catch (error) {
+    console.error("Conversation title generation failed:", error.message);
+    return fallbackTitle;
+  }
 };
 
 export const agent = async (req, res) => {
