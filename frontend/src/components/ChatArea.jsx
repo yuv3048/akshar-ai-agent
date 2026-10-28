@@ -48,7 +48,7 @@ function ChatArea({ onOpenSidebar }) {
           console.error("Failed to load conversation messages:", error.response?.data || error.message);
           dispatch(setMessages([]));
           dispatch(setArtifacts([]));
-          dispatch(setMessagePagination({ hasMore: false, nextCursor: null }));
+          dispatch(setMessagePagination({ hasMore: false, nextCursor: null, totalCount: 0 }));
         }
       }
     };
