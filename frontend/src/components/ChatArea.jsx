@@ -4,7 +4,7 @@ import MessageList from "./MessageList";
 import Nav from "./Nav";
 import { useDispatch, useSelector } from "react-redux";
 import getMessages from "../features/getMessages";
-import { setArtifacts, setMessages } from "../redux/messageSlice";
+import { setArtifacts, setMessages, setMessagePagination } from "../redux/messageSlice";
 
 function ChatArea({ onOpenSidebar }) {
   const { selectedConversation } = useSelector((state) => state.conversation);
@@ -31,11 +31,12 @@ function ChatArea({ onOpenSidebar }) {
       dispatch(setArtifacts([]));
 
       try {
-        const data = await getMessages(selectedConversation._id);
+        const page = await getMessages(selectedConversation._id, { limit: 20 });
         if (cancelled) return;
 
-        const messages = Array.isArray(data) ? data : [];
+        const messages = Array.isArray(page?.items) ? page.items : [];
         dispatch(setMessages(messages));
+        dispatch(setMessagePagination(page));
 
         const latestArtifactMessage = [...messages]
           .reverse()
@@ -47,10 +48,12 @@ function ChatArea({ onOpenSidebar }) {
           console.error("Failed to load conversation messages:", error.response?.data || error.message);
           dispatch(setMessages([]));
           dispatch(setArtifacts([]));
+          dispatch(setMessagePagination({ hasMore: false, nextCursor: null }));
         }
       }
     };
 
+    dispatch(setMessagePagination({ hasMore: false, nextCursor: null }));
     loadMessages();
     return () => {
       cancelled = true;
