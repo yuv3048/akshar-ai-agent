@@ -70,7 +70,9 @@ function ChatArea({ onOpenSidebar }) {
         suggestedAction={suggestedAction}
         onSuggestionConsumed={clearSuggestedAction}
         onSendingChange={setIsGenerating}
+        onOpenBilling={() => setBillingOpen(true)}
       />
+      <BillingDrawer open={billingOpen} onClose={() => setBillingOpen(false)} />
     </div>
   );
 }
