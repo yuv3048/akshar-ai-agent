@@ -30,6 +30,9 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
   const [errorMessage, setErrorMessage] = useState("");
   const { selectedConversation } = useSelector((state) => state.conversation);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [listening, setListening] = useState(null);
+  const recognitionRef = useRef(null);
+
   const fileRef = useRef(null);
   const dispatch = useDispatch();
 
@@ -135,7 +138,50 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
     }
   };
 
+  const toggleMic=()=>{
+    if(!recognitionRef.current) {
+      alert("speech recognition not supported")
+    
+    if(listening){
+      recognitionRef.current.stop()
+      setListening(false)
+    }else{
+      recognitionRef.current.start()
+      setListening(true)
+    }
+  }
+
   useEffect(() => {
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    if(!SpeechRecognition)return;
+
+    const recognition=new SpeechRecognition()
+    recognition. lang="en-US"
+    recognition.interimResults = true;
+    recognition.continuous = true;
+
+    recognition.onresults=(event)=>{
+    console. log(event)
+    }
+
+    recognitionRef.current=recognition
+
+    recognition.onresult=(event)=>{
+
+    let transcript = ""
+
+  for (let index = event.resultIndex; index < event.results.length; index++) {
+
+      transcript+=event.results[index][0].transcript
+  }
+
+  setValue(transcript)
+
+  recognition.onend=()=>{
+  setListening(false)
+  }
+
     if (!suggestedAction || lastHandledAction.current === suggestedAction) return;
 
     lastHandledAction.current = suggestedAction;
@@ -251,12 +297,12 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
                 title="Attach PDF or image"
                 disabled={sending}
                 onClick={() => fileRef.current?.click()}
-                className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border border-transparent bg-transparent text-slate-400 transition-all hover:bg-white/[0.06] hover:text-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-9 w-45 px-2 cursor-pointer items-center justify-between rounded-xl border border-transparent bg-transparent text-slate-400 transition-all hover:bg-white/[0.06] hover:text-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <Paperclip size={18} />
+                <Paperclip size={18} /> <span className="text-[10px] text-slate-600">PDF or image · Max 20 MB</span>
               </button>
-              <span className="ml-1 text-[10px] text-slate-600">PDF or image · Max 20 MB</span>
               <button
+                onClick={toggleMic}
                 type="button"
                 aria-label="Voice input"
                 title="Voice input"
