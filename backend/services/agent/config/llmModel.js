@@ -37,6 +37,9 @@ export const getModel = async (agent) => {
     case "coding":
       return deepseek;
 
+    case "imageAnalyzer":
+      return gemini;
+
     default:
       return groqWithGeminiFallback;
   }

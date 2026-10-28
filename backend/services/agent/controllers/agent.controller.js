@@ -60,6 +60,7 @@ export const agent = async (req, res) => {
       prompt: prompt.trim(),
       conversationId,
       userId,
+      file,
       agent: requestedAgent || "auto",
     });
 

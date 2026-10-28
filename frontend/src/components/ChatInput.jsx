@@ -15,6 +15,9 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
   const [sending, setSending] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { selectedConversation } = useSelector((state) => state.conversation);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileRef = useRef(null);
+
   const dispatch = useDispatch();
 
   const handleSendMessage = async (promptOverride, agentOverride) => {
@@ -164,8 +167,14 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
+            <input type="file" accept='.pdf,image/*' hidden ref={fileRef} onChange={(e)=>{
+              const file = e.target.files[0]
+              if(file){
+                setSelectedFile(file)
+              }
+            }}/>
             <button type="button" aria-label="Attach file" className="flex items-center justify-center w-9 h-9 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-white/[0.06] border border-transparent transition-all duration-150 bg-transparent cursor-pointer">
-              <Paperclip size={18} />
+              <Paperclip size={18} onClick={()=>fileRef.current.click()}/>
             </button>
             <button type="button" aria-label="Voice input" className="flex items-center justify-center w-8 h-8 rounded-lg text-slate-300 hover:text-slate-400 hover:bg-white/[0.05] border border-transparent hover:border-white/[0.06] transition-all duration-150 bg-transparent cursor-pointer">
               <MicAudioLines size={18} />

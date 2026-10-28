@@ -1,0 +1,73 @@
+import fs from "fs";
+import { PDFParse } from "pdf-parse";
+import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+import { getModel } from "../config/llmModel.js";
+import { vectorStore } from "../config/vectorDB.js";
+import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+import { deductCredits } from "../utils/deductCredits.js";
+
+export const pdfRag = async (state)=>{
+
+    try{
+        const buffer = fs.readFileSync(state.file.path)
+        const pdf = new PDFParse({
+            data: buffer
+        })
+
+        const result = pdf.getText()
+        const text = result.text
+
+        const spilliter = new RecursiveCharacterTextSplitter({
+            chunkSize: 1000,
+            chunkOverlap: 200,
+        })
+
+        const docs = await spilliter.createDocuments([text])
+        const collectionName = `pdf-${Date.now()}`;
+        const store = await vectorStore(docs, collectionName);
+
+        const relevantDocs = await store.similaritySearch(state.prompt, 5)
+
+        const context = relevantDocs.map(d=>d.pageContent).join("/n/n");
+
+        const llm = await getModel("pdf-rag")
+
+        const messages = [
+            new SystemMessage(`
+You are CortexAI PDF Assistant.
+
+Rules:
+- Answer ONLY from the uploaded PDF.
+- Never make up information.
+- If the answer is not present in the PDF, reply:
+
+"I couldn't find this information in the uploaded PDF."
+
+- Use Markdown formatting.
+    `),
+            new HumanMessage(`
+                Context: ${context},
+                Question:${state.prompt}
+                `)
+            
+        ]
+
+        const response = llm.invoke(messages)
+        await deductCredits(state.userId, "pdf")
+        return{
+            ...state,
+            aiResponse: response.content
+        }
+
+    }catch(error){
+
+        console.log(error)
+        return{
+            ...state,
+            aiResponse:"Failed to Analyze pdf"
+        }
+
+    }finally{
+        fs.unlinkSync(state.file.path)
+    }
+}

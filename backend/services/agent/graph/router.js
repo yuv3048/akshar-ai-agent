@@ -9,6 +9,21 @@ export const router = async(state)=>{
         }
     }
 
+
+    if(state.file.mimetype==="application/pdf"){
+      return {
+        ...state,
+        agent:"pdfRag"
+      }
+    }
+
+    if(state.file.mimetype.startsWith ==="image/"){
+      return {
+        ...state,
+        agent:"imageAnalyzer"
+      }
+    }
+
     const llm = await getModel("router")
   
 const prompt = `
@@ -112,8 +127,7 @@ Examples:
 ### 4. PDF AND PPT
 
 - Creating, editing, reading, or analyzing a PDF -> pdf.
-- Creating, editing, designing, or analyzing a presentation
-  -> ppt.
+- Creating, editing, designing, or analyzing a presentation -> ppt.
 
 Choose the agent responsible for the primary deliverable.
 
