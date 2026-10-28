@@ -56,6 +56,23 @@ export const getConversation = async (req, res) => {
   }
 };
 
+export const getConversationById = async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const conversation = await Conversation.findOne({
+      _id: req.params.conversationId,
+      userId,
+    });
+    if (!conversation) return res.status(404).json({ message: "Conversation not found" });
+    return res.status(200).json(conversation);
+  } catch (error) {
+    console.error("Get conversation by id error:", error);
+    return res.status(400).json({ message: "Invalid conversation id" });
+  }
+};
+
 export const updateConversation = async (req, res) => {
   try {
     const userId = getUserId(req);
