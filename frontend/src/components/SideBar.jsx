@@ -86,7 +86,7 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
 
   return (
     <>
-      <aside className={`hidden h-screen w-14 shrink-0 flex-col items-center gap-2 border-r border-white/6 bg-[#050505] py-4 lg:flex ${collapsed ? "" : "lg:hidden"}`}>
+      <aside className={`hidden h-screen w-14 shrink-0 flex-col items-center gap-2 border-r border-white/[0.07] bg-[#070707] py-4 lg:flex ${collapsed ? "" : "lg:hidden"}`}>
         <button
           type="button"
           aria-label="Expand sidebar"
@@ -117,14 +117,14 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
       )}
       <aside className={`fixed inset-y-0 left-0 z-50 h-dvh w-70 shrink-0 overflow-hidden border-r border-white/6 bg-[#050505] transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full"} ${collapsed ? "lg:hidden" : "lg:static lg:translate-x-0"}`}>
       <div className="flex h-full min-h-0 flex-col overflow-hidden">
-        <div className="flex shrink-0 items-center gap-2.5 px-4 py-5 border-b border-white/6">
+        <div className="flex shrink-0 items-center gap-2.5 px-4 py-5 border-b border-white/[0.07]">
            <img
               src="./akshar-logo.svg"
               alt="Akshar AI"
-              className="w-8 h-8 scale-160"
+              className="h-8 w-8 object-contain"
             />
-            <span className='font-space font-bold text-[16px] text-slate-500'>/</span>
-            <span className="font-doto text-[20px] font-bold text-slate-300 flex-1">
+            <span className='font-space text-sm font-medium text-slate-600'>/</span>
+            <span className="flex-1 font-space text-[17px] font-semibold tracking-tight text-slate-100">
                Akshar AI
             </span>
             <button
@@ -170,7 +170,7 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
         </div>
 
         {conversations.length == 0 ? (
-          <div className="shrink-0 px-5 pt-4 pb-1.5 text-[10.5px] font-bold font-inter uppercase tracking-widest text-slate-600 ">
+          <div className="shrink-0 px-5 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-600 ">
             No Recent Conversations
           </div>
         ) : (
@@ -188,11 +188,11 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
             return (
               <div
                 key={conv._id}
-                className={`flex items-center gap-2.5 cursor-pointer mb-0.5 px-3 py-2.5 font-inter border transition-colors duration-150 
+                className={`flex items-center gap-2.5 cursor-pointer mb-1 cursor-pointer rounded-xl border px-3 py-2.5 font-inter transition-colors duration-150 
                     ${
                       isActive
-                        ? "bg-orange-500/10 border-red-500/18 rounded-r-lg border-l-2 border-l-orange-600"
-                        : "bg-transparent border-transparent"
+                        ? "border-orange-500/20 bg-orange-500/[0.09] text-white"
+                        : "border-transparent bg-transparent hover:bg-white/[0.04]"
                     }`}
                 onClick={() => { dispatch(setMessages([])); dispatch(setArtifacts([])); dispatch(setSelectedConversation(conv)); onMobileClose?.(); }}
               >
@@ -200,7 +200,7 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
                   className={`flex items-center justify-center shrink-0 w-7 h-7
                           rounded-lg transition-colors duration-150 ${
                             isActive
-                              ? "bg-red-700/15 text-orange-600 "
+                              ? "bg-orange-500/10 text-orange-300 "
                               : "bg-white/5 text-slate-500"
                           }`}
                 >
@@ -232,10 +232,10 @@ function SideBar({ mobileOpen = false, onMobileClose }) {
                     src={userData?.avatar}
                     alt={"image"}
                     onError={() => setImageError(true)}
-                    className="w-9 h-9 rounded-[10px] object-cover border-2 border-orange-600/25"
+                    className="h-9 w-9 rounded-xl border border-white/10 object-cover"
                   />
                 ) : (
-                  <div className="w-9 h-9 flex items-center justify-center rounded-[10px] border-2 border-orange-600/25">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04]">
                     <CircleUserRound size={20} className="text-slate-400" />
                   </div>
                 )}
