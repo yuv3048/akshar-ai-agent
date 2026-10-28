@@ -122,7 +122,20 @@ Choose formatting according to the content and the user's request. A good answer
 
     return { ...state, aiResponse };
   } catch (error) {
+    const message = String(error?.message || "");
+    const isInsufficientCredits = /not enough credits/i.test(message);
+
+    if (isInsufficientCredits) {
+      // Expected business-rule rejection: keep it clear for the user and avoid
+      // logging a full stack trace as if the service itself had crashed.
+      console.warn("Chat request rejected: insufficient credits.");
+      return {
+        ...state,
+        aiResponse: "❌ You don't have enough credits to send this message. Please add credits or upgrade your plan and try again.",
+      };
+    }
+
     console.error("Chat agent failed:", error.stack || error);
-    return { ...state, aiResponse: "❌ Failed to generate Response..🥺" };
+    return { ...state, aiResponse: "❌ Failed to generate a response. Please try again." };
   }
 };
