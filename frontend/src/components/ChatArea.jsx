@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import ChatInput from "./ChatInput";
 import MessageList from "./MessageList";
 import Nav from "./Nav";
+import BillingDrawer from "./BillingDrawer";
 import { useDispatch, useSelector } from "react-redux";
 import getMessages from "../features/getMessages";
 import { setArtifacts, setMessages, setMessagePagination } from "../redux/messageSlice";
@@ -11,6 +12,7 @@ function ChatArea({ onOpenSidebar }) {
   const dispatch = useDispatch();
   const [suggestedAction, setSuggestedAction] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [billingOpen, setBillingOpen] = useState(false);
   const clearSuggestedAction = useCallback(() => setSuggestedAction(null), []);
 
   useEffect(() => {
