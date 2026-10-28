@@ -7,6 +7,7 @@ const messageSlice = createSlice({
     artifacts: [],
     messagesCursor: null,
     hasMoreMessages: false,
+    totalMessages: 0,
     loadingOlderMessages: false,
   },
   reducers: {
@@ -21,12 +22,16 @@ const messageSlice = createSlice({
     setMessagePagination: (state, action) => {
       state.messagesCursor = action.payload.nextCursor ?? null;
       state.hasMoreMessages = Boolean(action.payload.hasMore);
+      if (Number.isFinite(action.payload.totalCount)) {
+        state.totalMessages = action.payload.totalCount;
+      }
     },
     setLoadingOlderMessages: (state, action) => {
       state.loadingOlderMessages = action.payload;
     },
     addMessage: (state, action) => {
       state.messages.push(action.payload);
+      state.totalMessages += 1;
     },
     setArtifacts: (state, action) => {
       state.artifacts = action.payload;
