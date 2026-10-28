@@ -88,7 +88,8 @@ export const agent = async (req, res) => {
     await addMessage(conversationId, userId, "assistant", response);
 
     let title = null;
-    if (generateTitle === true) {
+    // FormData serializes booleans as strings, so accept both representations.
+    if (generateTitle === true || generateTitle === "true") {
       try {
         const titleResponse = await axios.post(
           `${process.env.CHAT_SERVICE_URL}/update-conversation`,
