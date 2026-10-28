@@ -35,6 +35,7 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
   const [errorMessage, setErrorMessage] = useState("");
   const { selectedConversation } = useSelector((state) => state.conversation);
   const { userData } = useSelector((state) => state.user);
+  const [selectedFile, setSelectedFile] = useState(null);
   const credits = Number(userData?.credits ?? 0);
   const creditCosts = { auto: 1, chat: 1, search: 5, coding: 10, pdf: 10, ppt: 10, vision: 15 };
   // File analysis uses the relevant specialist's credit cost, regardless of the selected chip.
@@ -42,7 +43,6 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
     ? (selectedFile.type === "application/pdf" ? creditCosts.pdf : creditCosts.vision)
     : (creditCosts[selectedAgent.toLowerCase()] ?? creditCosts.auto);
   const insufficientCredits = Boolean(userData) && credits < requiredCredits;
-  const [selectedFile, setSelectedFile] = useState(null);
   const [listening, setListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(true);
   const recognitionRef = useRef(null);
