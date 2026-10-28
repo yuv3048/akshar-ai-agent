@@ -35,9 +35,13 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
   const [errorMessage, setErrorMessage] = useState("");
   const { selectedConversation } = useSelector((state) => state.conversation);
   const { userData } = useSelector((state) => state.user);
-  const [creditBlockedByServer, setCreditBlockedByServer] = useState(false);
   const credits = Number(userData?.credits ?? 0);
-  const outOfCredits = Boolean(userData) && (credits <= 0 || creditBlockedByServer);
+  const creditCosts = { auto: 1, chat: 1, search: 5, coding: 10, pdf: 10, ppt: 10, vision: 15 };
+  // File analysis uses the relevant specialist's credit cost, regardless of the selected chip.
+  const requiredCredits = selectedFile
+    ? (selectedFile.type === "application/pdf" ? creditCosts.pdf : creditCosts.vision)
+    : (creditCosts[selectedAgent.toLowerCase()] ?? creditCosts.auto);
+  const insufficientCredits = Boolean(userData) && credits < requiredCredits;
   const [selectedFile, setSelectedFile] = useState(null);
   const [listening, setListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(true);
@@ -69,7 +73,7 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
 
   const handleSendMessage = async (promptOverride, agentOverride) => {
     const prompt = (promptOverride ?? value).trim();
-    if ((!prompt && !selectedFile) || sending || outOfCredits) return;
+    if ((!prompt && !selectedFile) || sending || insufficientCredits) return;
 
     if (listeningRef.current) {
       recognitionRef.current?.stop();
@@ -152,7 +156,9 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
         const currentUser = await getCurrentUser();
         if (currentUser) {
           dispatch(setUserdata(currentUser));
-          setCreditBlockedByServer(creditRejected && Number(currentUser.credits ?? 0) <= 0);
+          if (creditRejected) {
+            setErrorMessage("You don’t have enough credits for this action. Add credits to continue.");
+          }
         }
       } catch (refreshError) {
         console.warn("Could not refresh account credits:", refreshError.message);
@@ -311,18 +317,18 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
   return (
     <div className="w-full shrink-0 bg-[#000000] px-3 pb-4 pt-2 sm:px-5">
       <div className="mx-auto w-full max-w-4xl">
-        {outOfCredits && (
+        {insufficientCredits && (
         <div role="status" className="mb-3 flex flex-col gap-3 rounded-2xl border border-orange-500/25 bg-gradient-to-r from-orange-500/[0.10] to-red-600/[0.06] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-slate-100">You’re out of credits</p>
-            <p className="mt-1 text-xs leading-relaxed text-slate-400">Add credits to continue chatting and using Akshar AI tools.</p>
+            <p className="text-sm font-semibold text-slate-100">Not enough credits for this action</p>
+            <p className="mt-1 text-xs leading-relaxed text-slate-400">This action needs {requiredCredits} credits, but you have {credits}. Add credits to continue.</p>
           </div>
           <button type="button" onClick={onOpenBilling} className="inline-flex shrink-0 cursor-pointer items-center justify-center rounded-xl bg-gradient-to-r from-orange-600 to-red-600 px-4 py-2 text-xs font-semibold text-white transition hover:brightness-110">
             Add Credits
           </button>
         </div>
       )}
-      <div className={`group flex flex-col gap-3 rounded-2xl border border-white/[0.10] bg-[#0D0F14] px-3 pb-3 pt-3 shadow-[0_12px_45px_rgba(0,0,0,0.28)] transition-colors focus-within:border-orange-500/35 sm:px-4 ${outOfCredits ? "opacity-60" : ""}`}>
+      <div className={`group flex flex-col gap-3 rounded-2xl border border-white/[0.10] bg-[#0D0F14] px-3 pb-3 pt-3 shadow-[0_12px_45px_rgba(0,0,0,0.28)] transition-colors focus-within:border-orange-500/35 sm:px-4 ${insufficientCredits ? "opacity-60" : ""}`}>
           <div className="flex w-full gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {agents.map((agent) => {
               const isActive = selectedAgent === agent.label;
@@ -387,7 +393,9 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
 
           <textarea
             placeholder={
-              selectedFile?.type === "application/pdf"
+              insufficientCredits
+                ? `Need ${requiredCredits} credits to continue...`
+                : selectedFile?.type === "application/pdf"
                 ? "Ask a question about this PDF..."
                 : selectedFile
                   ? "Ask something about this image..."
@@ -454,7 +462,7 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
                       ? "Stop voice input"
                       : "Start voice input"
                 }
-                disabled={sending || outOfCredits || !speechSupported}
+                disabled={sending || insufficientCredits || !speechSupported}
                 onClick={toggleMic}
                 className={`ml-1 flex cursor-pointer items-center gap-1.5 bg-transparent px-1 text-xs disabled:cursor-not-allowed disabled:opacity-40 ${
                   listening ? "text-orange-600" : "text-slate-500"
@@ -467,11 +475,11 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
 
             <button
               type="button"
-              disabled={(!value.trim() && !selectedFile) || sending || outOfCredits}
+              disabled={(!value.trim() && !selectedFile) || sending || insufficientCredits}
               onClick={() => handleSendMessage()}
               aria-label={sending ? "Sending message" : "Send message"}
               className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-none transition-all duration-150 ${
-                (value.trim() || selectedFile) && !sending && !outOfCredits
+                (value.trim() || selectedFile) && !sending && !insufficientCredits
                   ? "cursor-pointer bg-linear-to-br from-orange-500 to-red-600 text-white shadow-[0_4px_18px_rgba(234,70,35,0.18)] hover:brightness-110"
                   : "cursor-not-allowed bg-white/[0.05] text-slate-600"
               }`}
