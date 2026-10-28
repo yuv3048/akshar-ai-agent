@@ -4,11 +4,11 @@ import {
   Globe2,
   ImageIcon,
   MessageSquare,
-  Mic,
+  AudioLines,
+  MicOff,
   Paperclip,
   Presentation,
   Send,
-  Square,
   X,
   Zap,
 } from "lucide-react";
@@ -435,22 +435,13 @@ function ChatInput({ suggestedAction = null, onSuggestionConsumed, onSendingChan
                 }
                 disabled={sending || !speechSupported}
                 onClick={toggleMic}
-                className={`relative ml-1 flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-xl border transition-all disabled:cursor-not-allowed disabled:opacity-40 ${
-                  listening
-                    ? "border-orange-500/50 bg-orange-500/15 text-orange-300 shadow-[0_0_18px_rgba(249,115,22,0.15)]"
-                    : "border-white/[0.07] bg-white/[0.03] text-slate-400 hover:border-white/[0.12] hover:bg-white/[0.07] hover:text-white"
+                className={`ml-1 flex cursor-pointer items-center gap-1.5 bg-transparent px-1 text-xs disabled:cursor-not-allowed disabled:opacity-40 ${
+                  listening ? "text-green-500" : "text-red-500"
                 }`}
               >
-                {listening && (
-                  <span className="absolute inset-0 animate-ping rounded-xl border border-orange-400/30" />
-                )}
-                {listening ? <Square size={14} fill="currentColor" /> : <Mic size={18} />}
+                {listening ? <AudioLines size={18} /> : <MicOff size={18} />}
+                <span>{listening ? "Listening" : "Mic off"}</span>
               </button>
-              {listening && (
-                <span className="hidden whitespace-nowrap text-[10px] font-medium text-orange-300 sm:inline">
-                  Listening
-                </span>
-              )}
             </div>
 
             <button
