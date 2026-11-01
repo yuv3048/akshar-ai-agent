@@ -79,7 +79,7 @@ export const previewAsset = async (req, res) => {
 
     res.setHeader(
       "Content-Disposition",
-      `inline; filename="${filename.replace(/["\\r\\n]/g, "_")}"`
+      `inline; filename="${filename.replace(/["\r\n]/g, "_")}"`
     );
 
     await pipeline(result.Body, res);
