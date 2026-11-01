@@ -60,7 +60,7 @@ export const downloadAsset = async (req, res) => {
     );
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="${filename.replace(/["\\r\\n]/g, "_")}"`
+      `attachment; filename="${filename.replace(/["\r\n]/g, "_")}"`
     );
 
     if (result.ContentLength != null) {
