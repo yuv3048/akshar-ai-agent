@@ -9,19 +9,9 @@ const Port = process.env.PORT
 
 const app = express();
 
-app.use(express.json({ limit: "1mb" }));
+app.use(express.json());
 
 app.use("/", router)
-
-app.get("/health", (req, res) => {
-    res.status(200).json({
-        service: "akshar-ai-agent",
-        status: "ok",
-        capabilities: {
-            vision: Boolean(process.env.CF_ACCOUNT_ID && process.env.CF_API_TOKEN && process.env.AGENT_SERVICE_SECRET),
-        },
-    });
-});
 
 app.get("/",(req,res)=>{
     res.json({
